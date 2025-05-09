@@ -1,0 +1,16 @@
+#written by TheSquidychicken
+#
+#title:Список 
+#author:{name:orc_prefix}{name:orc_suffix}
+#types:mordor,gundabad,dol_guldur,angmar
+#reward
+#
+Эти червяки заслуживают смерти! Они почувствуют лезвие моего {choose:кинжала/топора/копья/ятагана} в своих кишках!
+
+{name:orc_prefix}{name:orc_suffix} (no.{num:1,99999})
+{name:orc_prefix}{name:orc_suffix} (no.{num:1,99999})
+{name:orc_prefix}{name:orc_suffix} (no.{num:1,99999})
+{name:orc_prefix}{name:orc_suffix} (no.{num:1,99999})
+{name:orc_prefix}{name:orc_suffix} (no.{num:1,99999})
+
+Мне удалось найти других {num:4,10} ребят, которые предложили мне помочь убить этих подонков. Как только мы закончим, мы ограбим их тела и скажем, что они упали со скал. Командиры и военачальники ничего об этом не узнают.

@@ -1,0 +1,13 @@
+#Written by Glflegolas
+#
+#title:The {choose:Founding/History} of {name:gondorVillage_prefix}{name:gondorVillage_suffix}
+#author:{name:gondor_male}
+#types:gondor
+#
+This village was founded in the year T.A. {num:2500,2950}, by the {choose:Master/Captain/Lord} {name:gondor_male}.
+
+It began as a small farming village with a few cottages.
+
+Gradually, the population of the village grew, and a tavern, named {name:gondorTavern_prefix} {name:gondorTavern_suffix}, was built by the bartender {name:gondor_male}. It is said that the {choose:ale/wine/mead/cider/vodka/lemon liqueur/lime liqueur/carrot wine/rum} in this tavern was so good that travellers came here from far and wide to enjoy it.
+
+From there, the village's population continued to grow, with {choose:a blacksmith setting up shop, selling some of the finest tools and weapons in all of Gondor/the construction of a stable, where the stablemaster bred some of the finest horses south of Rohan/the construction of a mighty fortress and walls, in order to keep the inhabitants safe from marauding Orcs attracted by the village's wealth. The village became so large, it became a town/the arrival of many wealthy merchants, who brought goods from lands far and wide: exotic woods, fresh fish, building supplies, and much more besides}.

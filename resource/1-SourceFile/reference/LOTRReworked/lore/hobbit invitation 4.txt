@@ -1,0 +1,10 @@
+#title:Invitation
+#author:Bilbo Baggins
+#types:shire
+Message to be delivered to Folco Boffin,
+Little Delving.
+
+Dear Mr. Boffin,
+I invite you and your lovely wife to the celebration of my eleventy-first birthday party at the Party Field, Hobbiton, on the 22nd of September.
+Hoping you will enjoy yourselves,
+Bilbo Baggins

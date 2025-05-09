@@ -1,0 +1,10 @@
+#written by Boost the Cat
+#
+#title:A Warning to All Bucklanders
+#author:Shirriff {name:hobbit_male} {name:hobbit_surname}
+#types:shire,bree
+#reward
+#
+We have had {choose:multiple/several/a great many} reported Missing Person incidents of late, the subjects of which are all {choose:stated/said/rumoured} to have last been {choose:seen/sighted} entering the Old Forest.
+
+As we {choose:are all aware/all very well know}, the {choose:Old Forest/Forest} is {choose:quite wild/very dangerous}, its trees {choose:awake/angry}, and it is {choose:never/not} to be entered, under any circumstances. If you should see {choose:someone/a Hobbit/anyone} entering the Forest, you must alert the Shirriffs {choose:immediately/at once}.

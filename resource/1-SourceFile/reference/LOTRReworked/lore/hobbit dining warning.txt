@@ -1,0 +1,15 @@
+#Written by Thaumablazer
+#
+#title:One Last Warning
+#author:{name:hobbit_female}
+#types:shire
+#
+Dear {name:hobbit_male},
+
+We must discuss your dining etiquette - or rather, the lack thereof.
+
+Without fail, each time we host a neighborhood dinner or picnic, you hog well over half of the food for yourself without giving anyone else a chance to eat their fill!
+
+And furthermore, during {name:hobbit_male}'s party last week, when he brought out the barrels of perry, you had the absolute gall to smother your lips all over the taps, and drain the contents then and there!
+
+Your behavior is ill-befitting of a gentleman of your stature. It is absolutely unacceptable, and this is your last warning. Should you continue to be so insolent during our next gathering, you should not expect any further invitations from any of our family ever again!

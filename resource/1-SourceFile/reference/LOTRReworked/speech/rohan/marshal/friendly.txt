@@ -1,0 +1,12 @@
+Do you seek to hire a warrior of the Riddermark, #?
+Our warriors are the finest horsemen in all Middle-earth.
+You have earned respect among our people, #. Do you wish to hire any warriors?
+In exchange for a small sum of silver coins, my Rohirrim will gladly follow you into battle.
+I can grant you the might of the Rohirrim in exchange for some silver coins.
+We Rohirrim are noble warriors, but even noble warriors require payment.
+I have many fine warriors for hire. Have you any silver coins?
+My men are the finest warriors in all of Rohan!
+For a few silver coins, you can command the mightiest warriors in Rohan.
+Welcome, #! Do you seek to command the valiant Rohirrim?
+I will give you some of my fine warriors, but you will need to pay me some silver coins first, #.
+You are truly a friend of Rohan. My men will be proud to fight on your side.

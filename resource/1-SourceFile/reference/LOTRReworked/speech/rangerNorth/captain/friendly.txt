@@ -1,0 +1,11 @@
+Do you seek to command the Dúnedain of the North, friend #?
+These Dúnedain will follow your leadership for a small price, #.
+Bring some silver coins and you can have some Rangers under your command.
+Are you here with the intention of hiring Rangers of the North?
+I can grant you the leadership of some excellent Rangers in return for silver coins.
+The Rangers of the North now respect you enough to follow your command, #.
+The Rangers of the North only follow good and valiant Men into battle. You are worthy to lead us.
+My men are the finest Rangers in all of the North!
+I will give you some of my men for a dozen silver coins.
+Such great warriors as my men do not fight for nothing, #! They require payment.
+You are worthy enough to command my valiant Rangers.

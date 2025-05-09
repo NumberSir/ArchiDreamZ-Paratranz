@@ -1,0 +1,35 @@
+# Written by Aldan Tanneo
+#title:Of the Kingdom of Doriath
+#author:Elenwë of the Grey Havens
+#types:lindon,rivendell,lothlorien,eregion,woodland_realm,eriador,gondor
+#reward
+#
+# The randomization is here to simulate the effect of handwritten text, which each writer may change a bit.
+#
+§lOf the Kingdom of Doriath§r
+§oBy Elenwë of the Grey Havens§r
+§oCopy made by {name:sindarin_male}.§r
+
+Before the {choose:Firstborn/Eldar} awoke, before the first Dawn and the first sunset, the Great Forests covered all the lands of {choose:Endor/Middle-earth/the Wide World}.
+
+When those who would later become the {choose:Calaquendi/Elves of the Light} arrived in Beleriand, on their way to {choose:Valinor/the Blessed Realm}, they rested on the shores of Middle-earth... and some of them remained, never to cross {choose:Belegaer/the Sundering Seas}. Amongst those folk was Elwë of the Teleri, who would later be known as Elu Thingol; the High King of all Sindar who walked upon Earth in the First Age of {choose:Arda/Eä/the Sun}.
+
+Thingol met Melian of the Maiar in the dark woods of Nan Elmoth, where sang the nightingale. The beauty of her voice from afar enchanted him, and in a clearing of silver grass, under the dim twilight of {choose:Varda/the stars}, he came upon Melian and stood there listening to her song. The years passed, and the trees grew up around him, and yet he remained there; under the fair enchantment of her song, he forgot all thoughts of the Valar, the Two Trees, and even his own people.
+
+When at last Thingol awoke, it was only to find his people gone, save for his most loyal followers and friends. The greater part of the Teleri had come to believe their king was lost forever; and under the lordship of Thingol's brother Olwë, they passed over Sea to the Blessed Realm. But Thingol and his folk yet remained; and there in the forests of Region and Neldoreth, King Thingol made his realm, and Melian sat by his side, fairer and wiser than all Queens of Arda in ages since. They named their dwellings Menegroth, the Thousand Caves. The power of Melian protected the Kingdom, set like a great fence unseen about the forests which Thingol ruled, a ward against all foes; and so their realm was called Doriath, the Land of the Girdle, in the tongue of the {choose:Sindar/Grey-elves}.
+
+Thingol and Melian alone ruled all Beleriand, until the Exiled Noldor arrived, led by Fëanor. To the Noldorin lords Thingol in his grace gave the lordship of wide realms he needed not, keeping for himself only the forest-lands of Region and Neldoreth. And while the Exiles waged their ill-fated War against {choose:Morgoth/the Enemy/the Dark Foe in the North}, the Girdle of Melian kept Doriath safe and undisturbed.
+
+In those days Thingol gathered to himself much wealth, in gold, silver, and precious gems; and strength of arms, in sword, spear, and wrought mail; and the treasure-hoard of Doriath grew vast indeed.
+
+Yet the wealth of Thingol was to be the downfall of Doriath. After Beren and Lúthien left the country (a tale too long to be told in full here) and Húrin son of Galdor returned the Nauglamír to Menegroth, the Elven-king sought the help of the {choose:Dwarves/Naugrim} in order to forge the Nauglamír anew. Then the Silmaril of Fëanor, which Beren and Lúthien had taken from the crown of Morgoth himself, was set within the new-forged necklace; and never was any treasure so bright and beautiful as the Nauglamír in those days, nor have been any treasures since.
+
+But the Dwarves grew jealous of their own work and greatly desired to keep the Nauglamír for themselves. They came in strength of war to Doriath, and demanded the necklace from King Thingol. He replied that the Nauglamír was his by right, as truly it was; yet his response awoke in the Dwarves such wrath that they slew him there and then, in the caves of Menegroth, within his own kingdom. Thus ever since has been a bitter grudge between the folk of Elves and Dwarves.
+
+Beren and the Green-elves avenged the slaying of Thingol, attacking the Dwarves as they fled in disgrace back to Nogrod. Melian departed from Beleriand, and returned, it is said, to the Gardens of Lórien in Valinor, where she still grieves for her husband and her king. And the Girdle of Doriath was no more.
+
+Alas for Doriath the fair! Alas for the Thousand Caves, and King Thingol, and Melian the wise!
+
+Thereafter, the remaining Sons of Fëanor invaded Doriath, and they slew Dior, Thingol's heir, as they sought to reclaim the Jewel of their father. Thus in kinslaying was dealt the utmost Ruin of Doriath, and thus did the ruinous Oath of Fëanor ensnare the House of Thingol in its doom.
+
+Yet the Sons of Fëanor did not capture the Silmaril of Beren that they sought. It was borne away by Elwing, daughter of Dior, to the havens of Sirion, for upon that Silmaril was laid a much greater doom: and it shines on to this day upon the brow of Eärendil, a star of hope in the morning and evening sky.

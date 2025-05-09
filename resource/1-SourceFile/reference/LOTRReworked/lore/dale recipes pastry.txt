@@ -1,0 +1,24 @@
+#Written by LordDainTheAwsome
+#
+#title:Dalish Recipes, p. 28
+#author:{name:dale_female} of Dale
+#types:dale
+#reward
+#
+Dalish Pastry.
+
+Ingredients:
+* 1 egg
+* 2 bowls of maple syrup
+* 3 pounds of wheat grain
+* 1 pint of milk
+* 2 handfuls of cocoa
+
+Instructions:
+* Mix wheat, egg and milk in a bowl
+* Grind cocoa beans and add to mixture
+* Bake in oven for 2 hours
+* Sprinkle with cocoa
+* Pour maple syrup in a swirl upon the cake
+
+Serves 1.

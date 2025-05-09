@@ -1,0 +1,17 @@
+# Karseius
+#
+#title:The Southern Campaign
+#author:{name:gondor_male}
+#types:southron,umbar,gondor
+#reward
+#
+Hen-na-Charad:
+This day, the seventeenth of the seventh month, year 1050 of the Third Age:
+
+My dear wife, I hope you are well. I write to you with joyous news of the campaign.
+
+Victory is ours, and the Southron {choose:forces/armies/rats} are crushed! Mighty Ciryaher has avenged his father, for the last great city of the Haradrim is taken. We found their wretched Prince lying dead in his palace. Our men soon defeated those few of his guard that had not fled the city.
+
+Afterwards, we gathered in the throne room to celebrate our great victory. All the lands of {choose:Harad/the South/Haradwaith} are ours now. The King has taken the name of Hyarmendacil, for thus shall he be known by all the years and ages to come.
+
+I hope to return to you soon, my dear wife. I have acquired many fine trinkets and trophies during the campaign. There is a {choose:fine golden necklace, inset with a blue stone/fine golden ring, adorned with a cleverly wrought serpent/rich flute of carven ebony/curious copper trinket engraved with strange runes}, which I believe you will take a liking to.

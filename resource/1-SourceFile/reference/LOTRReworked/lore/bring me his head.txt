@@ -1,0 +1,14 @@
+#written by:Gorbag12
+#
+#title:Bring me his head!
+#author:{name:orc_prefix}{name:orc_suffix}, scribe of {name:orc_prefix}{name:orc_suffix}
+#types:ruins,gundabad,angmar,dol_guldur,mordor,isengard
+#reward
+#
+Hey, you, maggot! The Boss told me that you're good at hunting!
+
+He asked me, the scribe, if I could write a letter to you little maggot, telling you to bring the him the head of the stinking tark {name:gondor_male}. That fool laughed at the might of the Boss. Let's see if he can still laugh when his head's separated from his shoulders!
+
+If you bring the Boss the tark's head, he will give you five hundred silver pieces as a reward for your stinking deed! And if not, the Boss will take your foul head instead, little maggot!
+
+Now go ahead and do as you've been ordered!

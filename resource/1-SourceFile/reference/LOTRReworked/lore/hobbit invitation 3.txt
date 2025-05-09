@@ -1,0 +1,10 @@
+#title:Invitation
+#author:Bilbo Baggins
+#types:shire
+Message to be delivered to Adelard Took,
+Tuckenborough.
+
+Dear Mr. Took,
+I would be delighted if you were to attend the festivities of my 111th birthday party at the Party Field, Hobbiton, on the 22nd September. All your family are welcome and there will be many pleasant surprises.
+Your servant,
+Bilbo Baggins

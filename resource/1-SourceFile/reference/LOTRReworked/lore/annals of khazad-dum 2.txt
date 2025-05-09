@@ -1,0 +1,14 @@
+#title:Annals of Khazad-dûm, Volume II
+#author:{name:dwarf_female} of Erebor
+#types:durins_folk,dale,rivendell,blue_mountains
+#reward
+#
+The friendship between the Khazâd of Khazad-dûm and the Elves of Eregion brought much fortune to both realms. However, it was not to last.
+
+In the 1697th year of the Second Age, the Dark Enemy of Mordor invaded the land of Hollin. He came with Orc-hosts beyond count, to destroy their mighty kingdom, and break the great friendship of our peoples. Durin III, then Lord of Khazad-dûm, did not sit idle; he sent a great host to aid our Elven friends, but though we fought fiercely, we could not save the people of Hollin. We were forced to retreat back into Khazad-dûm, shutting our gates against the Dark Lord - and the outside world.
+
+These were grim days, an age of grief and woe, for it was also at this time that the holy mountain of Gundabad, where Durin the Deathless awoke, was sacked and conquered by Orcs of the North. Among all the vile acts of the Orcs through the long ages of history, this sacrilege is counted the worst. Though we had not the strength to retake the mountain then, we swore - as we do now - that one day, Mount Gundabad would again belong to the Children of Durin.
+
+The isolation of Khazad-dûm was absolute, though it would for a time be broken during the Great War of the Last Alliance, when we marched with Men and Elves against the hosts of Mordor. After that terrible war, our people shut the gates once again, and retreated back into our halls.
+
+Thus conclude the Annals of Khazad-dûm during the Second Age of the World.

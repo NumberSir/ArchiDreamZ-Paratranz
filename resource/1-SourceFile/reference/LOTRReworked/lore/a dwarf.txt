@@ -1,0 +1,11 @@
+#Formatting Test
+#
+#title:A Hard Day's Work
+#author:{name:dwarf_male} son of {name:dwarf_male}
+#types:durins_folk
+#
+Today I drank {num:5,10} tankards of ale.
+
+I worked with {name:dwarf_male} in the mines, and we delved for {num:1,6} hours, as every Dwarf should!
+
+Then I went home to my dear wife, {name:dwarf_female} daughter of {name:dwarf_male}. Over a hearty feast, we sang of the old tales of {choose:Durin/Balin/Fundin/Thráin} and {choose:Khazad-dûm/Gabilgathol/Tumunzahar/the Lonely Mountain}.

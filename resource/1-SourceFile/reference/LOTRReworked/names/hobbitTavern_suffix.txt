@@ -1,0 +1,17 @@
+Barrel
+Brew
+Dragon
+Dwarf
+Elf
+Farmer
+Goblin
+Hearth
+Hobbit
+Horse
+Knight
+Pony
+Ranger
+Tankard
+Troll
+Wanderer
+Wizard

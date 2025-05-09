@@ -1,0 +1,13 @@
+#title:Visitor's Log
+#author:{name:hobbit_male} and {name:hobbit_female}
+#types:shire
+{name:hobbit_male} {name:hobbit_surname}
+{name:hobbit_female} {name:hobbit_surname}
+{name:hobbit_male} {name:hobbit_surname}
+{name:hobbit_female} {name:hobbit_surname}
+{name:hobbit_male} {name:hobbit_surname}
+{name:hobbit_male} {name:hobbit_surname}
+{name:hobbit_female} {name:hobbit_surname}
+{name:hobbit_female} {name:hobbit_surname}
+{name:hobbit_male} {name:hobbit_surname}
+{name:hobbit_female} {name:hobbit_surname}

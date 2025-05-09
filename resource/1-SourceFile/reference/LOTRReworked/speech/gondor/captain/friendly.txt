@@ -1,0 +1,12 @@
+Do you seek to command the armies of Gondor, #?
+Gondor's forces can be yours to command for only a small sum of silver.
+Our soldiers need paying, #!
+Bring some silver coins and you can have some soldiers.
+Are you here with the intention of hiring Gondor's soldiers?
+I can grant you some warriors in return for silver coins.
+The Men of Gondor now respect you enough to follow you into battle, #.
+The people of Gondor trust you, #. You may command our valiant warriors.
+Do you wish to command the mighty armies of Gondor?
+For a few dozen silver coins, you can command very valiant and loyal soldiers.
+If you wish to take my troops to battle, you'll have to pay for them!
+Give me some silver coins and I'll give you some soldiers!
