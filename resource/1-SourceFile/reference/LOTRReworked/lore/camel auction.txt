@@ -1,8 +1,0 @@
-# Karseius
-#
-#title:Auction Notice
-#author:{name:nomad_male}
-#types:harnennor,southron,umbar,nomad,gulf
-#reward
-#
-Friends from near and far away! Read and rejoice, for the great yearly Camel Auction draws near! Big camels, strong camels, fast camels, beautiful camels, we have them all! Bring your savings and reward yourself with a fine new companion, guaranteed to guide you safely through the sands! Come to {choose:Ijdi-ilel/Izêm-ulzuz/Ayûkaph-amâm} and join the festivities. Camel along!
