@@ -14,6 +14,7 @@ from src.log import logger
 
 DIR_ORIGINAL = settings.file.root / settings.file.source / "original"
 DIR_REFERENCE = settings.file.root / settings.file.source / "reference"
+DIR_TRANSLATION = settings.file.root / settings.file.source / "translation"
 
 
 @dataclass
@@ -28,6 +29,7 @@ class FileType(Enum):
     LANG = auto()
     JSON_LANG = auto()
     PLAINTEXT_IN_LINES = auto()
+    PLAINTEXT = auto()
 
     CUSTOM_NPCS_DIALOGS = auto()
     CUSTOM_NPCS_QUESTS = auto()
@@ -43,6 +45,7 @@ class Project:
 
     @staticmethod
     def categorize(filepath: Path) -> FileType:
+        filepath_str = str(filepath)
         match filepath.name:
             case "en_US.lang" | "ru_RU.lang" | "zh_CN.lang":
                 return FileType.LANG
@@ -56,12 +59,13 @@ class Project:
             case ".lang":
                 return FileType.LANG
             case ".txt":
+                if "lore" in filepath_str:
+                    return FileType.PLAINTEXT
                 return FileType.PLAINTEXT_IN_LINES
             case _:
                 pass
 
         """ special """
-        filepath_str = str(filepath)
         if "CustomNPCs" in filepath_str:
             if "dialogs" in filepath_str:
                 return FileType.CUSTOM_NPCS_DIALOGS
@@ -100,19 +104,24 @@ class Project:
             with open(DIR_REFERENCE / filepath.parent / "en_US.lang", "r", encoding="utf-8") as fp:
                 lines_reference = fp.readlines()
 
+        if translation_flag := (DIR_TRANSLATION / filepath.parent / "zh_CN.lang").exists():
+            with open(DIR_TRANSLATION / filepath.parent / "zh_CN.lang", "r", encoding="utf-8") as fp:
+                lines_translation = fp.readlines()
+
         result = []
         for idx, line in enumerate(lines):
             line = line.strip()
             if not line:  # blank
-                continue
+                key = f"BLANK-{idx}"
+                value = line
 
-            if line.startswith("#"):  # comment
-                continue
+            elif "=" not in line:  # comment / misc
+                key = f"COMMENT-{idx}" if line.startswith("#") else f"MISC-{idx}"
+                value = line
 
-            if "=" not in line:  # misc
-                continue
+            else:   #normal
+                key, value = line.split("=", 1)
 
-            key, value = line.split("=", 1)
             data = Data(
                 key=key,
                 original=value,
@@ -120,10 +129,13 @@ class Project:
                 context=f"{idx}"
             )
             if reference_flag:
-                for idx_, line_ in enumerate(lines_reference):
-                    if not line_.startswith(f"{key}="):
-                        continue
-                    data.context = f"{data.context}\n{line_.split('=', 1)[1]}"
+                for line_ in lines_reference:
+                    if line_.startswith(f"{key}="):
+                        data.context = f"{data.context}\n{line_.split('=', 1)[1]}"
+            if translation_flag:
+                for line_ in lines_translation:
+                    if line_.startswith(f"{key}="):
+                        data.translation = f"{line_.split('=', 1)[1].strip()}"
             result.append(data)
 
         return result
@@ -137,27 +149,31 @@ class Project:
             with open(DIR_REFERENCE / filepath.parent / "en_us.json", "r", encoding="utf-8") as fp:
                 content_reference = json.load(fp)
 
-        return [
-            Data(
-                key=k,
-                original=v,
+        if translation_flag := (DIR_TRANSLATION / filepath.parent / "zh_cn.json").exists():
+            with open(DIR_TRANSLATION / filepath.parent / "zh_cn.json", "r", encoding="utf-8") as fp:
+                content_translation = json.load(fp)
+
+        result = []
+        for key, value in content.items():
+            data = Data(
+                key=key,
+                original=value,
                 translation="",
-                context=content_reference[k]
             )
-            if reference_flag and k in content_reference
-            else Data(
-                key=k,
-                original=v,
-                translation=""
-            )
-            for k, v in content.items()
-        ]
+            if reference_flag:
+                data.context = content_reference.get(key, "Not exist in reference")
+            if translation_flag:
+                data.translation = content_translation.get(key, "")
+            result.append(data)
+        return result
 
     def _convert_misc(self, filepath: Path, type_: FileType) -> list[Data]:
         """plaintext, generally"""
         match type_:
+            case FileType.PLAINTEXT:
+                return self._convert_misc_plaintext(filepath)
             case FileType.PLAINTEXT_IN_LINES:
-                return self._convert_misc_in_lines(filepath)
+                return self._convert_misc_plaintext_in_lines(filepath)
             case FileType.CUSTOM_NPCS_DIALOGS:
                 return self._convert_misc_customnpcs_dialog(filepath)
             case FileType.CUSTOM_NPCS_QUESTS:
@@ -165,7 +181,31 @@ class Project:
             case _:
                 raise Exception(f"Unknown file type when convert: {filepath}")
 
-    def _convert_misc_in_lines(self, filepath: Path) -> list[Data]:
+    def _convert_misc_plaintext(self, filepath: Path) -> list[Data]:
+        """plaintext, whole file"""
+        with open(DIR_ORIGINAL / filepath, "r", encoding="utf-8") as fp:
+            content = fp.read()
+
+        if reference_flag := (DIR_REFERENCE / filepath).exists():
+            with open(DIR_REFERENCE / filepath, "r", encoding="utf-8") as fp:
+                content_reference = fp.read()
+
+        if translation_flag := (DIR_TRANSLATION / filepath).exists():
+            with open(DIR_TRANSLATION / filepath, "r", encoding="utf-8") as fp:
+                content_translation = fp.read()
+
+        data = Data(
+            key=f"{filepath.with_suffix('').name}",
+            original=content,
+            translation=""
+        )
+        if reference_flag:
+            data.context = content_reference
+        if translation_flag:
+            data.translation = content_translation
+        return [data]
+
+    def _convert_misc_plaintext_in_lines(self, filepath: Path) -> list[Data]:
         """plaintext, split in lines"""
         with open(DIR_ORIGINAL / filepath, "r", encoding="utf-8") as fp:
             lines = fp.readlines()
@@ -178,19 +218,31 @@ class Project:
                 # logger.warning(f"reference not compatible: {filepath}")
                 reference_flag = False
 
-        return [
-            Data(
-                key=f"{idx}",
-                original=line,
-                translation="",
-                context=lines_reference[idx]
-            ) if reference_flag else Data(
-                key=f"{idx}",
+        if translation_flag := (DIR_TRANSLATION / filepath).exists():
+            with open(DIR_TRANSLATION / filepath, "r", encoding="utf-8") as fp:
+                lines_translation = fp.readlines()
+
+            if len(lines) != len(lines_translation):
+                # logger.warning(f"translation not compatible: {filepath}")
+                translation_flag = False
+
+        result = []
+        for idx, line in enumerate(lines):
+            key = f"{idx}"
+            if not line.strip():
+                key = f"BLANK-{key}"
+
+            data = Data(
+                key=key,
                 original=line,
                 translation=""
-            ) for idx, line in enumerate(lines)
-            if line.strip()
-        ]
+            )
+            if reference_flag:
+                data.context = lines_reference[idx]
+            if translation_flag:
+                data.translation = lines_translation[idx]
+            result.append(data)
+        return result
 
     def _convert_misc_customnpcs_dialog(self, filepath: Path) -> list[Data]:
         with open(DIR_ORIGINAL / filepath, "r", encoding="utf-8") as fp:
@@ -198,42 +250,71 @@ class Project:
 
         option_slots = re.findall(r'\"OptionSlot\": (\d+),*\n', content)
         option_titles = re.findall(r'\"Title\": \"([\s\S]*?)\",*\n', content)
-
-        dialog_title = re.findall(r'\"DialogTitle\": \"([\s\S]*?)\",*\n', content)
         dialog_text = re.findall(r'\"DialogText\": \"([\s\S]*?)\",*\n', content)
 
-        data = {
-            "dialogtitle": dialog_title[0] if dialog_title else "",
+        fetch = {
             "dialogtext": dialog_text[0] if dialog_text else "",
             **dict(zip(option_slots, option_titles)),
         }
 
-        return [
-            Data(
-                key=k,
-                original=v,
+        if translation_flag := (DIR_TRANSLATION / filepath).exists():
+            with open(DIR_TRANSLATION / filepath, "r", encoding="utf-8") as fp:
+                content_translation = fp.read()
+
+            option_slots_translation = re.findall(r'\"OptionSlot\": (\d+),*\n', content_translation)
+            option_titles_translation = re.findall(r'\"Title\": \"([\s\S]*?)\",*\n', content_translation)
+            dialog_text_translation = re.findall(r'\"DialogText\": \"([\s\S]*?)\",*\n', content_translation)
+
+            fetch_translation = {
+                "dialogtext": dialog_text_translation[0] if dialog_text_translation else "",
+                **dict(zip(option_slots_translation, option_titles_translation)),
+            }
+
+        result = []
+        for key, value in fetch.items():
+            data = Data(
+                key=key,
+                original=value,
                 translation="",
-            ) for k, v in data.items()
-        ]
+            )
+            if translation_flag:
+                data.translation = fetch_translation.get(key, "")
+            result.append(data)
+        return result
 
     def _convert_misc_customnpcs_quests(self, filepath: Path) -> list[Data]:
         with open(DIR_ORIGINAL / filepath, "r", encoding="utf-8") as fp:
             content = fp.read()
 
-        data = {
+        fetch = {
             "title": re.findall(r'\"Title\": \"([\s\S]*?)\",*\n', content)[0],
             "text": re.findall(r'\"Text\": \"([\s\S]*?)\",*\n', content)[0],
             "completetext": re.findall(r'\"CompleteText\": \"([\s\S]*?)\",*\n', content)[0],
             "nextquesttitle": re.findall(r'\"NextQuestTitle\": \"([\s\S]*?)\",*\n', content)[0],
         }
 
-        return [
-            Data(
-                key=k,
-                original=v,
+        if translation_flag := (DIR_TRANSLATION / filepath).exists():
+            with open(DIR_TRANSLATION / filepath, "r", encoding="utf-8") as fp:
+                content_translation = fp.read()
+
+            fetch_translation = {
+                "title": re.findall(r'\"Title\": \"([\s\S]*?)\",*\n', content_translation)[0],
+                "text": re.findall(r'\"Text\": \"([\s\S]*?)\",*\n', content_translation)[0],
+                "completetext": re.findall(r'\"CompleteText\": \"([\s\S]*?)\",*\n', content_translation)[0],
+                "nextquesttitle": re.findall(r'\"NextQuestTitle\": \"([\s\S]*?)\",*\n', content_translation)[0],
+            }
+
+        result = []
+        for key, value in fetch.items():
+            data = Data(
+                key=key,
+                original=value,
                 translation="",
-            ) for k, v in data.items()
-        ]
+            )
+            if translation_flag:
+                data.translation = fetch_translation.get(key, "")
+            result.append(data)
+        return result
 
     def restore(self):
         """paratranz jsons to local raw texts"""
@@ -291,8 +372,10 @@ class Project:
     def _restore_misc(self, filepath: Path, type_: FileType):
         """plaintext, generally"""
         match type_:
+            case FileType.PLAINTEXT:
+                return self._restore_misc_plaintext(filepath)
             case FileType.PLAINTEXT_IN_LINES:
-                return self._restore_misc_in_lines(filepath)
+                return self._restore_misc_plaintext_in_lines(filepath)
             case FileType.CUSTOM_NPCS_DIALOGS:
                 return self._restore_misc_customnpcs_dialog(filepath)
             case FileType.CUSTOM_NPCS_QUESTS:
@@ -300,7 +383,14 @@ class Project:
             case _:
                 raise Exception(f"Unknown file type when restore: {filepath}")
 
-    def _restore_misc_in_lines(self, filepath: Path):
+    def _restore_misc_plaintext(self, filepath: Path):
+        with open(settings.file.root / settings.file.download / filepath, "r", encoding="utf-8") as fp:
+            content = json.load(fp)
+
+        with open(settings.file.root / settings.file.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
+            fp.write(content["translation"])
+
+    def _restore_misc_plaintext_in_lines(self, filepath: Path):
         with open(settings.file.root / settings.file.download / filepath, "r", encoding="utf-8") as fp:
             content = json.load(fp)
 
@@ -337,7 +427,6 @@ class Project:
             )
 
         for pattern, key in {
-            re.compile(r'\"DialogTitle\": \"([\s\S]*?)\",*\n'): "dialogtitle",
             re.compile(r'\"DialogText\": \"([\s\S]*?)\",*\n'): "dialogtext"
         }.items():
             original = self._regex_restore(pattern, content, key, original)
