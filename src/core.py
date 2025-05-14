@@ -287,7 +287,6 @@ class Project:
             content = fp.read()
 
         fetch = {
-            "title": re.findall(r'\"Title\": \"([\s\S]*?)\",*\n', content)[0],
             "text": re.findall(r'\"Text\": \"([\s\S]*?)\",*\n', content)[0],
             "completetext": re.findall(r'\"CompleteText\": \"([\s\S]*?)\",*\n', content)[0],
             "nextquesttitle": re.findall(r'\"NextQuestTitle\": \"([\s\S]*?)\",*\n', content)[0],
