@@ -6,7 +6,10 @@
 ```shell
 pip install -r requirements.txt
 ```
-2. 在 `./resource/1-SourceFile` 文件夹下按照模组放入需要汉化的原文件，其中 `original` 文件夹中放原文件，若有其他语言参考请按照同样相对路径放入 `reference` 文件夹中，若有已经翻译好的文件请按照同样相对路径放入 `translation` 文件夹中
+2. 在 `./resource/1-SourceFile` 文件夹下按照模组放入需要汉化的原文件
+    - 其中 `original` 文件夹中放原文件
+    - 若有其他语言参考请按照同样相对路径放入 `reference` 文件夹中
+    - 若有已经翻译好的文件请按照同样相对路径放入 `translation` 文件夹中
 ```text
 resource
 ┖━ 1-SourceFile

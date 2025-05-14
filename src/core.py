@@ -34,6 +34,8 @@ class FileType(Enum):
     CUSTOM_NPCS_DIALOGS = auto()
     CUSTOM_NPCS_QUESTS = auto()
 
+    LOTR_RENEWED_SPEECH = auto()
+
 
 class Project:
     @staticmethod
@@ -71,6 +73,11 @@ class Project:
                 return FileType.CUSTOM_NPCS_DIALOGS
             elif "quests" in filepath_str:
                 return FileType.CUSTOM_NPCS_QUESTS
+
+        if "lotr" in filepath_str.lower():
+            if "speech" in filepath_str:
+                if filepath.suffix == ".json":
+                    return FileType.LOTR_RENEWED_SPEECH
 
         raise Exception(f"Unknown file type: {filepath}")
 
@@ -207,6 +214,8 @@ class Project:
                 return self._convert_misc_customnpcs_dialog(filepath)
             case FileType.CUSTOM_NPCS_QUESTS:
                 return self._convert_misc_customnpcs_quests(filepath)
+            case FileType.LOTR_RENEWED_SPEECH:
+                return self._convert_misc_lotr_renewed_speech(filepath)
             case _:
                 raise Exception(f"Unknown file type when convert: {filepath}")
 
@@ -344,6 +353,22 @@ class Project:
             result.append(data)
         return result
 
+    def _convert_misc_lotr_renewed_speech(self, filepath: Path) -> list[Data]:
+        with open(DIR_ORIGINAL / filepath, "r", encoding="utf-8") as fp:
+            content = json.load(fp)
+
+        result = []
+        for idx, speech in enumerate(content):
+            result.extend([
+                Data(
+                    key=f'{idx}-{idx_}',
+                    original=line,
+                    translation="",
+                )
+                for idx_, line in enumerate(speech['lines'])
+            ])
+        return result
+
     def restore(self):
         """paratranz jsons to local raw texts"""
         for root, dirs, files in os.walk(settings.filepath.root / settings.filepath.download):
@@ -424,6 +449,8 @@ class Project:
                 return self._restore_misc_customnpcs_dialog(filepath)
             case FileType.CUSTOM_NPCS_QUESTS:
                 return self._restore_misc_customnpcs_quests(filepath)
+            case FileType.LOTR_RENEWED_SPEECH:
+                return self._restore_misc_lotr_renewed_speech(filepath)
             case _:
                 raise Exception(f"Unknown file type when restore: {filepath}")
 
@@ -496,6 +523,25 @@ class Project:
 
         with open(settings.filepath.root / settings.filepath.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
             fp.write(original)
+
+    def _restore_misc_lotr_renewed_speech(self, filepath: Path):
+        with open(settings.filepath.root / settings.filepath.download / filepath, "r", encoding="utf-8") as fp:
+            content = json.load(fp)
+
+        with open(DIR_ORIGINAL / filepath.with_suffix(""), "r", encoding="utf-8") as fp:
+            original = json.load(fp)
+
+        for idx, speech in enumerate(original):
+            for idx_, line in enumerate(speech["lines"]):
+                if result := [
+                    _.get("translation", _["original"])
+                    for _ in content
+                    if _["key"] == f"{idx}-{idx_}"
+                ]:
+                    original[idx]["lines"][idx_] = result[0]
+
+        with open(settings.filepath.root / settings.filepath.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
+            json.dump(original, fp, ensure_ascii=False, indent=2)
 
     @staticmethod
     def _regex_restore(pattern: re.Pattern, content: list[dict], key: str, original: str):
