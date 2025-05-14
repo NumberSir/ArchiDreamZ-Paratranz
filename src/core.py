@@ -128,15 +128,44 @@ class Project:
                 translation="",
                 context=f"{idx}"
             )
+
             if reference_flag:
                 for line_ in lines_reference:
                     if line_.startswith(f"{key}="):
                         data.context = f"{data.context}\n{line_.split('=', 1)[1]}"
+                        break
+
             if translation_flag:
                 for line_ in lines_translation:
                     if line_.startswith(f"{key}="):
                         data.translation = f"{line_.split('=', 1)[1].strip()}"
+                        break
+
             result.append(data)
+
+        # some keys not exist in original but do exist in translation
+        if translation_flag:
+            for line_ in lines_translation:
+                if "=" not in line_:
+                    continue
+                newkey, newvalue = line_.split("=", 1)
+                if newkey in {_.key for _ in result}:
+                    continue
+
+                data = Data(
+                    key=newkey,
+                    original="MISSING",
+                    translation=newvalue,
+                    context="Additional in translation"
+                )
+
+                if reference_flag:
+                    for line_r in lines_reference:
+                        if line_r.startswith(f"{newkey}="):
+                            data.context = f"{data.context}\n{line_r.split('=', 1)[1]}"
+                            break
+
+                result.append(data)
 
         return result
 
@@ -342,9 +371,6 @@ class Project:
         with open(settings.file.root / settings.file.download / filepath, "r", encoding="utf-8") as fp:
             content = json.load(fp)
 
-        # with open(DIR_ORIGINAL / filepath.with_suffix(""), "r", encoding="utf-8") as fp:
-        #     original = fp.readlines()
-
         result = []
         for line in content:
             if line["key"].startswith("BLANK"):
@@ -360,11 +386,6 @@ class Project:
                 if line['translation'] else
                 f"{line['key']}={line['original']}".rstrip("\n") + "\n"
             )
-
-            # idx = line["context"].split("\n")[0]
-            # if not original[int(idx)].startswith(line["key"]):
-            #     logger.warning(f"File might not be consistent: {filepath.with_suffix('')}")
-            # original[int(idx)] = f"{line['key']}={line['translation']}".rstrip("\n") + "\n"
 
         with open(settings.file.root / settings.file.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
             fp.writelines(result)
@@ -409,9 +430,6 @@ class Project:
         with open(settings.file.root / settings.file.download / filepath, "r", encoding="utf-8") as fp:
             content = json.load(fp)
 
-        # with open(DIR_ORIGINAL / filepath.with_suffix(""), "r", encoding="utf-8") as fp:
-        #     original = fp.readlines()
-
         result = []
         for line in content:
             if line["key"].startswith("BLANK"):
@@ -423,11 +441,6 @@ class Project:
                 if line['translation'] else
                 line["original"].rstrip('\n') + "\n"
             )
-
-            # idx = line["key"]
-            # if original[int(idx)] != line["original"]:
-            #     logger.warning(f"File might not be consistent: {filepath.with_suffix('')}")
-            # original[int(idx)] = line['translation'].rstrip('\n') + "\n"
 
         with open(settings.file.root / settings.file.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
             fp.writelines(result)
