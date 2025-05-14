@@ -8,9 +8,9 @@ from src.paratranz import Paratranz
 def main():
     project = Project()
     project.clean(
-        settings.root / settings.file.converted,
-        settings.root / settings.file.download,
-        settings.root / settings.file.result,
+        settings.root / settings.filepath.converted,
+        settings.root / settings.filepath.download,
+        settings.root / settings.filepath.result,
     )
     project.convert()
 

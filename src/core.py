@@ -12,9 +12,9 @@ from src.log import logger
 
 # from src.libs.openapi_client import ApiClient as ParatranzClient, FilesApi, Configuration
 
-DIR_ORIGINAL = settings.file.root / settings.file.source / "original"
-DIR_REFERENCE = settings.file.root / settings.file.source / "reference"
-DIR_TRANSLATION = settings.file.root / settings.file.source / "translation"
+DIR_ORIGINAL = settings.filepath.root / settings.filepath.source / "original"
+DIR_REFERENCE = settings.filepath.root / settings.filepath.source / "reference"
+DIR_TRANSLATION = settings.filepath.root / settings.filepath.source / "translation"
 
 
 @dataclass
@@ -81,7 +81,7 @@ class Project:
                 filepath = Path(root) / file
                 relative_path = filepath.relative_to(DIR_ORIGINAL)
                 converted_path = relative_path.parent / f"{relative_path.name}.json"
-                os.makedirs(settings.file.root / settings.file.converted / relative_path.parent, exist_ok=True)
+                os.makedirs(settings.filepath.root / settings.filepath.converted / relative_path.parent, exist_ok=True)
 
                 file_type = self.categorize(relative_path)
                 match file_type:
@@ -92,7 +92,7 @@ class Project:
                     case _:
                         datas = self._convert_misc(relative_path, file_type)
 
-                with open(settings.file.root / settings.file.converted / converted_path, "w", encoding="utf-8") as fp:
+                with open(settings.filepath.root / settings.filepath.converted / converted_path, "w", encoding="utf-8") as fp:
                     json.dump([asdict(_) for _ in datas], fp, ensure_ascii=False, indent=2)
 
     def _convert_lang(self, filepath: Path) -> list[Data]:
@@ -346,13 +346,13 @@ class Project:
 
     def restore(self):
         """paratranz jsons to local raw texts"""
-        for root, dirs, files in os.walk(settings.file.root / settings.file.download):
+        for root, dirs, files in os.walk(settings.filepath.root / settings.filepath.download):
             for file in files:
                 filepath = Path(root) / file
-                relative_path = filepath.relative_to(settings.file.root / settings.file.download)
+                relative_path = filepath.relative_to(settings.filepath.root / settings.filepath.download)
                 relative_path = relative_path.with_suffix("")
                 converted_path = relative_path.parent / f"{relative_path.name}.json"
-                os.makedirs(settings.file.root / settings.file.result / relative_path.parent, exist_ok=True)
+                os.makedirs(settings.filepath.root / settings.filepath.result / relative_path.parent, exist_ok=True)
 
                 file_type = self.categorize(relative_path)
 
@@ -368,7 +368,7 @@ class Project:
                     logger.error(f'File not exist: {converted_path}')
 
     def _restore_lang(self, filepath: Path):
-        with open(settings.file.root / settings.file.download / filepath, "r", encoding="utf-8") as fp:
+        with open(settings.filepath.root / settings.filepath.download / filepath, "r", encoding="utf-8") as fp:
             content = json.load(fp)
 
         result = []
@@ -382,16 +382,19 @@ class Project:
                 continue
 
             result.append(
-                f"{line['key']}={line['translation']}".rstrip("\n") + "\n"
-                if line['translation'] else
-                f"{line['key']}={line['original']}".rstrip("\n") + "\n"
+                f"{line['key']}={line.get('translation', line['original'])}".rstrip("\n") + "\n"
             )
 
-        with open(settings.file.root / settings.file.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
+        if (DIR_TRANSLATION / filepath.parent / "zh_CN.lang").exists():
+            filepath = filepath.parent / "zh_CN.lang.json"
+        else:
+            filepath = filepath.parent / f"{settings.project.language}.lang.json"
+
+        with open(settings.filepath.root / settings.filepath.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
             fp.writelines(result)
 
     def _restore_json_lang(self, filepath: Path):
-        with open(settings.file.root / settings.file.download / filepath, "r", encoding="utf-8") as fp:
+        with open(settings.filepath.root / settings.filepath.download / filepath, "r", encoding="utf-8") as fp:
             content = json.load(fp)
 
         with open(DIR_ORIGINAL / filepath.with_suffix(""), "r", encoding="utf-8") as fp:
@@ -402,7 +405,12 @@ class Project:
                 logger.warning(f"File might not be consistent: {filepath.with_suffix('')}")
             original[data["key"]] = data.get("translation", data["original"])
 
-        with open(settings.file.root / settings.file.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
+        if (DIR_TRANSLATION / filepath.parent / "zh_cn.json").exists():
+            filepath = filepath.parent / "zh_cn.json.json"
+        else:
+            filepath = filepath.parent / f"{settings.project.language}.json.json"
+
+        with open(settings.filepath.root / settings.filepath.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
             json.dump(original, fp, ensure_ascii=False, indent=2)
 
     def _restore_misc(self, filepath: Path, type_: FileType):
@@ -420,14 +428,14 @@ class Project:
                 raise Exception(f"Unknown file type when restore: {filepath}")
 
     def _restore_misc_plaintext(self, filepath: Path):
-        with open(settings.file.root / settings.file.download / filepath, "r", encoding="utf-8") as fp:
+        with open(settings.filepath.root / settings.filepath.download / filepath, "r", encoding="utf-8") as fp:
             content = json.load(fp)
 
-        with open(settings.file.root / settings.file.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
+        with open(settings.filepath.root / settings.filepath.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
             fp.write(content[0].get("translation", content[0]["original"]))
 
     def _restore_misc_plaintext_in_lines(self, filepath: Path):
-        with open(settings.file.root / settings.file.download / filepath, "r", encoding="utf-8") as fp:
+        with open(settings.filepath.root / settings.filepath.download / filepath, "r", encoding="utf-8") as fp:
             content = json.load(fp)
 
         result = []
@@ -437,16 +445,14 @@ class Project:
                 continue
 
             result.append(
-                line['translation'].rstrip('\n') + "\n"
-                if line['translation'] else
-                line["original"].rstrip('\n') + "\n"
+                line.get('translation', line['original']).rstrip('\n') + "\n"
             )
 
-        with open(settings.file.root / settings.file.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
+        with open(settings.filepath.root / settings.filepath.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
             fp.writelines(result)
 
     def _restore_misc_customnpcs_dialog(self, filepath: Path):
-        with open(settings.file.root / settings.file.download / filepath, "r", encoding="utf-8") as fp:
+        with open(settings.filepath.root / settings.filepath.download / filepath, "r", encoding="utf-8") as fp:
             content = json.load(fp)
 
         with open(DIR_ORIGINAL / filepath.with_suffix(""), "r", encoding="utf-8") as fp:
@@ -456,7 +462,7 @@ class Project:
         for idx, title in enumerate(option_titles[::-1]):
             processed_line = title.group().replace(
                 title.groups()[0],
-                [_['translation'] for _ in content if int(_['key']) == len(option_titles) - idx - 1][0]
+                [_.get('translation', _["original"]) for _ in content if int(_['key']) == len(option_titles) - idx - 1][0]
             )
 
             original = (
@@ -470,11 +476,11 @@ class Project:
         }.items():
             original = self._regex_restore(pattern, content, key, original)
 
-        with open(settings.file.root / settings.file.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
+        with open(settings.filepath.root / settings.filepath.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
             fp.write(original)
 
     def _restore_misc_customnpcs_quests(self, filepath: Path):
-        with open(settings.file.root / settings.file.download / filepath, "r", encoding="utf-8") as fp:
+        with open(settings.filepath.root / settings.filepath.download / filepath, "r", encoding="utf-8") as fp:
             content = json.load(fp)
 
         with open(DIR_ORIGINAL / filepath.with_suffix(""), "r", encoding="utf-8") as fp:
@@ -488,7 +494,7 @@ class Project:
         }.items():
             original = self._regex_restore(pattern, content, key, original)
 
-        with open(settings.file.root / settings.file.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
+        with open(settings.filepath.root / settings.filepath.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
             fp.write(original)
 
     @staticmethod

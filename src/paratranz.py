@@ -32,10 +32,10 @@ class Paratranz:
         fileids = [_["id"] for _ in files]
         filepairs = dict(zip(filepaths, fileids))
 
-        for root, dirs, files in os.walk(settings.file.root / settings.file.converted):
+        for root, dirs, files in os.walk(settings.filepath.root / settings.filepath.converted):
             for file in files:
                 filepath = Path(root) / file
-                relative_path = filepath.relative_to(settings.file.root / settings.file.converted)
+                relative_path = filepath.relative_to(settings.filepath.root / settings.filepath.converted)
 
                 with open(filepath, "r") as fp:
                     file_data = fp.read()
@@ -69,8 +69,8 @@ class Paratranz:
 
     def download(self):
         logger.info("Starting downloading files from Paratranz...")
-        os.makedirs(settings.file.root / settings.file.tmp, exist_ok=True)
-        os.makedirs(settings.file.root / settings.file.download, exist_ok=True)
+        os.makedirs(settings.filepath.root / settings.filepath.tmp, exist_ok=True)
+        os.makedirs(settings.filepath.root / settings.filepath.download, exist_ok=True)
         with contextlib.suppress(httpx.TimeoutException):
             self._trigger_export()
         self._download_artifacts()
@@ -84,16 +84,16 @@ class Paratranz:
     def _download_artifacts(self):
         url = f"{self.base_url}/projects/{self.project_id}/artifacts/download"
         content = (self.client.get(url, headers=self.headers, follow_redirects=True)).content
-        with open(settings.file.root / settings.file.tmp / f"paratranz_export.zip", "wb") as fp:
+        with open(settings.filepath.root / settings.filepath.tmp / f"paratranz_export.zip", "wb") as fp:
             fp.write(content)
 
     def _extract_artifacts(self):
-        with ZipFile(settings.file.root / settings.file.tmp / f"paratranz_export.zip") as zfp:
-            zfp.extractall(settings.file.root / settings.file.tmp)
+        with ZipFile(settings.filepath.root / settings.filepath.tmp / f"paratranz_export.zip") as zfp:
+            zfp.extractall(settings.filepath.root / settings.filepath.tmp)
 
         shutil.copytree(
-            settings.file.root / settings.file.tmp / "utf8",
-            settings.file.root / settings.file.download,
+            settings.filepath.root / settings.filepath.tmp / "utf8",
+            settings.filepath.root / settings.filepath.download,
             dirs_exist_ok=True
         )
 

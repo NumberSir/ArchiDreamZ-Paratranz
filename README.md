@@ -32,6 +32,7 @@ resource
 3. 填写 `.env` 中的环境变量
 ```dotenv
 PROJECT_NAME=<项目名，默认为 ArchiDreamZ-Paratranz>
+PROJECT_LANGUAGE=<所要翻译成的语言代码，默认为 zh_cn>
 GITHUB_ACCESS_TOKEN=<GitHub 个人 token，暂时无用>
 PARATRANZ_PROJECT_ID=<Paratranz 项目 ID，整数>
 PARATRANZ_TOKEN=<Paratranz 个人 token，32 位字母数字组合>

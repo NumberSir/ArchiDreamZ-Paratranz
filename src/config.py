@@ -13,9 +13,10 @@ class ProjectSettings(BaseSettings):
 
     name: str = Field(default="SugarCube2-Localization")
     log_format: str = Field(default="<g>{time:HH:mm:ss}</g> | [<lvl>{level}</lvl>] | {message}")
+    language: str = Field(default="zh_cn")
 
 
-class FileSettings(BaseSettings):
+class FilepathSettings(BaseSettings):
     """About files / directories"""
     model_config = SettingsConfigDict(env_prefix="PATH_")
 
@@ -49,7 +50,7 @@ class Settings(BaseSettings):
     paratranz: ParatranzSettings = ParatranzSettings()
     github: GitHubSettings = GitHubSettings()
     project: ProjectSettings = ProjectSettings()
-    file: FileSettings = FileSettings()
+    filepath: FilepathSettings = FilepathSettings()
 
 
 settings = Settings()
