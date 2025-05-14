@@ -352,7 +352,7 @@ class Project:
                 continue
 
             if line["key"].startswith("COMMENT") or line["key"].startswith("MISC"):
-                result.append(line["translation"].rstrip("\n") + "\n" or line["original"])
+                result.append(line.get("translation", line["original"]).rstrip("\n") + "\n" or line["original"])
                 continue
 
             result.append(
@@ -379,7 +379,7 @@ class Project:
         for data in content:
             if data["key"] not in original:
                 logger.warning(f"File might not be consistent: {filepath.with_suffix('')}")
-            original[data["key"]] = data["translation"]
+            original[data["key"]] = data.get("translation", data["original"])
 
         with open(settings.file.root / settings.file.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
             json.dump(original, fp, ensure_ascii=False, indent=2)
@@ -403,7 +403,7 @@ class Project:
             content = json.load(fp)
 
         with open(settings.file.root / settings.file.result / filepath.with_suffix(""), "w", encoding="utf-8") as fp:
-            fp.write(content["translation"])
+            fp.write(content[0].get("translation", content[0]["original"]))
 
     def _restore_misc_plaintext_in_lines(self, filepath: Path):
         with open(settings.file.root / settings.file.download / filepath, "r", encoding="utf-8") as fp:
@@ -483,7 +483,7 @@ class Project:
         title = re.search(pattern, original)
         processed_line = title.group().replace(
             title.groups()[0],
-            [_["translation"] for _ in content if _["key"] == key][0]
+            [_.get("translation", _["original"]) for _ in content if _["key"] == key][0]
         )
         return (
             f"{original[:title.start()]}"
