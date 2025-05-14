@@ -12,6 +12,7 @@ class ProjectSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="PROJECT_")
 
     name: str = Field(default="SugarCube2-Localization")
+    log_level: str = Field(default="INFO")
     log_format: str = Field(default="<g>{time:HH:mm:ss}</g> | [<lvl>{level}</lvl>] | {message}")
     language: str = Field(default="zh_cn")
 
