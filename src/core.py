@@ -318,12 +318,13 @@ class Project:
 
     def restore(self):
         """paratranz jsons to local raw texts"""
-        for root, dirs, files in os.walk(DIR_ORIGINAL):
+        for root, dirs, files in os.walk(settings.file.root / settings.file.download):
             for file in files:
                 filepath = Path(root) / file
-                relative_path = filepath.relative_to(DIR_ORIGINAL)
+                relative_path = filepath.relative_to(settings.file.root / settings.file.download)
+                relative_path = relative_path.with_suffix("")
                 converted_path = relative_path.parent / f"{relative_path.name}.json"
-                os.makedirs(settings.file.root / settings.file.converted / relative_path.parent, exist_ok=True)
+                os.makedirs(settings.file.root / settings.file.result / relative_path.parent, exist_ok=True)
 
                 file_type = self.categorize(relative_path)
 
