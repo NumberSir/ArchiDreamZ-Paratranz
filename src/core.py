@@ -40,6 +40,8 @@ class FileType(Enum):
     CUSTOM_NPCS_DIALOGS = auto()
     CUSTOM_NPCS_QUESTS = auto()
 
+    LOTR_LEGACY_SPEECH = auto()
+    LOTR_LEGACY_NAMES = auto()
     LOTR_RENEWED_SPEECH = auto()
 
 
@@ -56,6 +58,9 @@ class Conversion:
 
                 logger.debug(f"Converting {relative_path}")
                 file_type = Project.categorize(relative_path)
+                if not file_type:
+                    continue
+
                 match file_type:
                     case FileType.LANG:
                         datas = self._convert_lang(relative_path, file_type)
@@ -256,6 +261,10 @@ class Conversion:
                 return self._convert_misc_customnpcs_quests(filepath, type_)
             case FileType.LOTR_RENEWED_SPEECH:
                 return self._convert_misc_lotr_renewed_speech(filepath, type_)
+            case FileType.LOTR_LEGACY_NAMES:
+                return self._convert_misc_lotr_legacy_names(filepath, type_)
+            case FileType.LOTR_LEGACY_SPEECH:
+                return self._convert_misc_lotr_legacy_speech(filepath, type_)
             case _:
                 raise Exception(f"Unknown file type when convert: {filepath}")
 
@@ -285,7 +294,7 @@ class Conversion:
             process_function=_process,
         )
 
-    def _convert_misc_plaintext_in_lines(self, filepath: Path, type_: FileType) -> list[Data]:
+    def _convert_misc_plaintext_in_lines(self, filepath: Path, type_: FileType, *, ignore_length_unequal: bool = False) -> list[Data]:
         """plaintext, split in lines"""
         def _process(**kwargs) -> list[Data]:
             original: list[str] = kwargs["original"]
@@ -296,10 +305,10 @@ class Conversion:
             
             if reference_flag and len(original) != len(reference):
                 logger.warning(f"Reference length {len(reference)} not equal to original {len(original)} <- {filepath}")
-                reference_flag = False
+                reference_flag = ignore_length_unequal
             if translation_flag and len(original) != len(translation):
                 logger.warning(f"Translation length {len(translation)} not equal to original {len(original)} <- {filepath}")
-                translation_flag = False
+                translation_flag = ignore_length_unequal
 
             result = []
             for idx, line in enumerate(original):
@@ -313,9 +322,9 @@ class Conversion:
                     translation=""
                 )
                 if reference_flag:
-                    data.context = reference[idx]
+                    data.context = reference[idx] if len(reference) > idx+1 else ""
                 if translation_flag:
-                    data.translation = translation[idx]
+                    data.translation = translation[idx] if len(translation) > idx+1 else ""
                 result.append(data)
             return result
 
@@ -426,6 +435,12 @@ class Conversion:
             process_function=_process,
         )
 
+    def _convert_misc_lotr_legacy_names(self, filepath: Path, type_: FileType) -> list[Data]:
+        return self._convert_misc_plaintext_in_lines(filepath=filepath, type_=type_, ignore_length_unequal=True)
+
+    def _convert_misc_lotr_legacy_speech(self, filepath: Path, type_: FileType) -> list[Data]:
+        return self._convert_misc_plaintext_in_lines(filepath=filepath, type_=type_, ignore_length_unequal=True)
+
 
 class Restoration:
     def restore(self):
@@ -440,6 +455,8 @@ class Restoration:
                 os.makedirs(settings.filepath.root / settings.filepath.result / relative_path.parent, exist_ok=True)
 
                 file_type = Project.categorize(relative_path)
+                if not file_type:
+                    continue
 
                 match file_type:
                     case FileType.LANG:
@@ -536,6 +553,10 @@ class Restoration:
                 return self._restore_misc_customnpcs_quests(filepath, type_)
             case FileType.LOTR_RENEWED_SPEECH:
                 return self._restore_misc_lotr_renewed_speech(filepath, type_)
+            case FileType.LOTR_LEGACY_NAMES:
+                return self._restore_misc_lotr_legacy_names(filepath, type_)
+            case FileType.LOTR_LEGACY_SPEECH:
+                return self._restore_misc_lotr_legacy_speech(filepath, type_)
             case _:
                 raise Exception(f"Unknown file type when restore: {filepath}")
 
@@ -644,6 +665,12 @@ class Restoration:
             process_function=_process,
         )
 
+    def _restore_misc_lotr_legacy_names(self, filepath: Path, type_: FileType):
+        return self._restore_misc_plaintext_in_lines(filepath=filepath, type_=type_)
+
+    def _restore_misc_lotr_legacy_speech(self, filepath: Path, type_: FileType):
+        return self._restore_misc_plaintext_in_lines(filepath=filepath, type_=type_)
+
     @staticmethod
     def _regex_restore(pattern: re.Pattern, content: list[dict], key: str, original: str):
         title = re.search(pattern, original)
@@ -680,8 +707,32 @@ class Project:
             logger.debug(f"Cleaned {filepath}")
 
     @staticmethod
-    def categorize(filepath: Path) -> FileType:
+    def categorize(filepath: Path) -> FileType | None:
         filepath_str = str(filepath)
+        filepath_str_lower = filepath_str.lower()
+        suffix = filepath.suffix or Path(filepath.name).suffix
+        """ special """
+        if "CustomNPCs" in filepath_str:
+            if "dialogs" in filepath_str:
+                logger.debug(f"{FileType.CUSTOM_NPCS_DIALOGS} <- {filepath} ")
+                return FileType.CUSTOM_NPCS_DIALOGS
+            if "quests" in filepath_str:
+                logger.debug(f"{FileType.CUSTOM_NPCS_QUESTS} <- {filepath} ")
+                return FileType.CUSTOM_NPCS_QUESTS
+
+        if "lotr" in filepath_str_lower:
+            if "speech" in filepath_str:
+                if suffix == ".json":
+                    logger.debug(f"{FileType.LOTR_RENEWED_SPEECH} <- {filepath} ")
+                    return FileType.LOTR_RENEWED_SPEECH
+                if suffix == ".txt":
+                    logger.debug(f"{FileType.LOTR_LEGACY_SPEECH} <- {filepath} ")
+                    return FileType.LOTR_LEGACY_SPEECH
+
+            if "names" in filepath_str:
+                logger.debug(f"{FileType.LOTR_LEGACY_NAMES} <- {filepath} ")
+                return FileType.LOTR_LEGACY_NAMES
+
         match filepath.name:
             case "en_US.lang" | "ru_RU.lang" | "zh_CN.lang":
                 logger.debug(f"{FileType.LANG} <- {filepath} ")
@@ -692,7 +743,6 @@ class Project:
             case _:
                 pass
 
-        suffix = filepath.suffix or Path(f" {filepath.name}").suffix
         match suffix:
             case ".lang":
                 logger.debug(f"{FileType.LANG} <- {filepath} ")
@@ -706,23 +756,8 @@ class Project:
             case _:
                 pass
 
-        """ special """
-        if "CustomNPCs" in filepath_str:
-            if "dialogs" in filepath_str:
-                logger.debug(f"{FileType.CUSTOM_NPCS_DIALOGS} <- {filepath} ")
-                return FileType.CUSTOM_NPCS_DIALOGS
-            elif "quests" in filepath_str:
-                logger.debug(f"{FileType.CUSTOM_NPCS_QUESTS} <- {filepath} ")
-                return FileType.CUSTOM_NPCS_QUESTS
-
-        if "lotr" in filepath_str.lower():
-            if "speech" in filepath_str:
-                if filepath.suffix == ".json":
-                    logger.debug(f"{FileType.LOTR_RENEWED_SPEECH} <- {filepath} ")
-                    return FileType.LOTR_RENEWED_SPEECH
-
         logger.error(f"Unknown file type: {filepath}")
-        raise Exception(f"Unknown file type: {filepath}")
+        return None
 
     @staticmethod
     def safe_read(filepath: Path, type_: FileType) -> FileContent | None:
@@ -744,7 +779,7 @@ class Project:
     @staticmethod
     def read(fp: io.TextIOBase, type_: FileType) -> list[str] | str | list | dict:
         match type_:
-            case FileType.LANG | FileType.PLAINTEXT_IN_LINES:
+            case FileType.LANG | FileType.PLAINTEXT_IN_LINES | FileType.LOTR_LEGACY_NAMES | FileType.LOTR_LEGACY_SPEECH:
                 return fp.readlines()
             case FileType.JSON_LANG | FileType.LOTR_RENEWED_SPEECH:
                 return json.load(fp)
@@ -754,7 +789,7 @@ class Project:
     @staticmethod
     def write(content: "FileContent", fp: io.TextIOBase, type_: FileType):
         match type_:
-            case FileType.LANG | FileType.PLAINTEXT_IN_LINES:
+            case FileType.LANG | FileType.PLAINTEXT_IN_LINES | FileType.LOTR_LEGACY_NAMES | FileType.LOTR_LEGACY_SPEECH:
                 fp.writelines(content)
             case FileType.JSON_LANG | FileType.LOTR_RENEWED_SPEECH:
                 json.dump(content, fp, ensure_ascii=False, indent=2)
