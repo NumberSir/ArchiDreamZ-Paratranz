@@ -22,6 +22,7 @@ class FilepathSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="PATH_")
 
     root: Path = Field(default=Path(__file__).parent.parent)
+    data: Path = Field(default=Path("data"))
     resource: Path = Field(default=Path("resource"))
     tmp: Path = Field(default=Path("resource/tmp"))
     source: Path = Field(default=Path("resource/1-SourceFile"))

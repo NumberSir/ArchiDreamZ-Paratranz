@@ -12,6 +12,7 @@ from src.log import logger
 
 class Paratranz:
     def __init__(self, client: httpx.Client):
+        logger.info("======= PARATRANZ START =======")
         self._client = client
         self._base_url = "https://paratranz.cn/api"
         self._headers = {"Authorization": settings.paratranz.token}
@@ -24,29 +25,29 @@ class Paratranz:
         #     )
         # )
 
-    def upload(self):
-        logger.info("Starting uploading files from Paratranz...")
-        files = self._get_files()
-
-        filepaths = [Path(_["name"]) for _ in files]
-        fileids = [_["id"] for _ in files]
-        filepairs = dict(zip(filepaths, fileids))
-
-        for root, dirs, files in os.walk(settings.filepath.root / settings.filepath.converted):
-            for file in files:
-                filepath = Path(root) / file
-                relative_path = filepath.relative_to(settings.filepath.root / settings.filepath.converted)
-
-                with open(filepath, "r") as fp:
-                    file_data = fp.read()
-
-                if relative_path in filepaths:  # update
-                    logger.info(f"Updating file: {relative_path}")
-                    self._update_file(file=file_data, fileid=filepairs[relative_path])
-                else:                           # create
-                    logger.info(f"Creating file: {relative_path}")
-                    self._create_file(file=file_data, path=relative_path)
-        logger.info("Upload completes.")
+    # def upload(self):
+    #     logger.info("Starting uploading files from Paratranz...")
+    #     files = self._get_files()
+    # 
+    #     filepaths = [Path(_["name"]) for _ in files]
+    #     fileids = [_["id"] for _ in files]
+    #     filepairs = dict(zip(filepaths, fileids))
+    # 
+    #     for root, dirs, files in os.walk(settings.filepath.root / settings.filepath.converted):
+    #         for file in files:
+    #             filepath = Path(root) / file
+    #             relative_path = filepath.relative_to(settings.filepath.root / settings.filepath.converted)
+    # 
+    #             with open(filepath, "r") as fp:
+    #                 file_data = fp.read()
+    # 
+    #             if relative_path in filepaths:  # update
+    #                 logger.info(f"Updating file: {relative_path}")
+    #                 self._update_file(file=file_data, fileid=filepairs[relative_path])
+    #             else:                           # create
+    #                 logger.info(f"Creating file: {relative_path}")
+    #                 self._create_file(file=file_data, path=relative_path)
+    #     logger.info("Upload completes.")
 
     # def _get_files(self) -> list[dict]:
     #     response = FilesApi(self.paratranz_client).get_files(self.project_id)
@@ -75,7 +76,7 @@ class Paratranz:
             self._trigger_export()
         self._download_artifacts()
         self._extract_artifacts()
-        logger.info("Download completes.")
+        logger.success("Download completes.")
 
     def _trigger_export(self):
         url = f"{self.base_url}/projects/{self.project_id}/artifacts"
@@ -84,11 +85,11 @@ class Paratranz:
     def _download_artifacts(self):
         url = f"{self.base_url}/projects/{self.project_id}/artifacts/download"
         content = (self.client.get(url, headers=self.headers, follow_redirects=True)).content
-        with open(settings.filepath.root / settings.filepath.tmp / f"paratranz_export.zip", "wb") as fp:
+        with open(settings.filepath.root / settings.filepath.tmp / "paratranz_export.zip", "wb") as fp:
             fp.write(content)
 
     def _extract_artifacts(self):
-        with ZipFile(settings.filepath.root / settings.filepath.tmp / f"paratranz_export.zip") as zfp:
+        with ZipFile(settings.filepath.root / settings.filepath.tmp / "paratranz_export.zip") as zfp:
             zfp.extractall(settings.filepath.root / settings.filepath.tmp)
 
         shutil.copytree(

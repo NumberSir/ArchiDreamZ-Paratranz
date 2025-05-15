@@ -36,9 +36,10 @@ resource
 ```dotenv
 PROJECT_NAME=<项目名，默认为 ArchiDreamZ-Paratranz>
 PROJECT_LANGUAGE=<所要翻译成的语言代码，默认为 zh_cn>
-GITHUB_ACCESS_TOKEN=<GitHub 个人 token，暂时无用>
-PARATRANZ_PROJECT_ID=<Paratranz 项目 ID，整数>
-PARATRANZ_TOKEN=<Paratranz 个人 token，32 位字母数字组合>
+PROJECT_LOG_LEVEL=<日志输出的最低等级，默认为 INFO>
+GITHUB_ACCESS_TOKEN=<必填。GitHub 个人 token，暂时无用>
+PARATRANZ_PROJECT_ID=<必填。Paratranz 项目 ID，整数>
+PARATRANZ_TOKEN=<必填。Paratranz 个人 token，32 位字母数字组合>
 ```
 4. 运行根目录下的 `main.py`
 ```shell

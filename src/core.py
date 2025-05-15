@@ -46,6 +46,7 @@ class FileType(Enum):
 class Conversion:
     def convert(self):
         """local raw texts to paratranz jsons"""
+        logger.info("======= CONVERSION START =======")
         for root, dirs, files in os.walk(DIR_ORIGINAL):
             for file in files:
                 filepath = Path(root) / file
@@ -53,6 +54,7 @@ class Conversion:
                 converted_path = relative_path.parent / f"{relative_path.name}.json"
                 os.makedirs(settings.filepath.root / settings.filepath.converted / relative_path.parent, exist_ok=True)
 
+                logger.debug(f"Converting {relative_path}")
                 file_type = Project.categorize(relative_path)
                 match file_type:
                     case FileType.LANG:
@@ -61,28 +63,40 @@ class Conversion:
                         datas = self._convert_json_lang(relative_path, file_type)
                     case _:
                         datas = self._convert_misc(relative_path, file_type)
+                
+                if datas is None:
+                    logger.warning(f"Converting failed: {relative_path}")
+                    return
 
                 with open(settings.filepath.root / settings.filepath.converted / converted_path, "w", encoding="utf-8") as fp:
                     json.dump([asdict(_) for _ in datas], fp, ensure_ascii=False, indent=2)
+                logger.success(f"Converted successfully: {relative_path}")
+                logger.debug(f"Total keys: {len(datas)}")
 
-    def _convert_general(self, filepath: Path, type_: FileType, process_function: Callable[..., list[Data]], **kwargs) -> list[Data]:
+    @staticmethod
+    def _convert_general(filepath: Path, type_: FileType, process_function: Callable[..., list[Data]], **kwargs) -> list[Data] | None:
         filepath_original = DIR_ORIGINAL / filepath
-        with open(filepath_original, "r", encoding="utf-8") as fp:
-            original = Project.read(fp, type_)
+        original = Project.safe_read(filepath_original, type_)
+        if not original:
+            return None
 
         reference = None
         filename_reference: str | None = kwargs.get("filename_reference", None)
         filepath_reference = (DIR_REFERENCE / filepath.parent / filename_reference) if filename_reference else (DIR_REFERENCE / filepath)
         if reference_flag := filepath_reference.exists():
-            with open(filepath_reference, "r", encoding="utf-8") as fp:
-                reference = Project.read(fp, type_)
+            logger.debug(f"Reference file exists: {filepath_reference}")
+            reference = Project.safe_read(filepath_reference, type_)
+            if not reference:
+                reference_flag = False
 
         translation = None
         filename_translation: str | None = kwargs.get("filename_translation", None)
         filepath_translation = (DIR_TRANSLATION / filepath.parent / filename_translation) if filename_translation else (DIR_TRANSLATION / filepath)
         if translation_flag := filepath_translation.exists():
-            with open(filepath_translation, "r", encoding="utf-8") as fp:
-                translation = Project.read(fp, type_)
+            logger.debug(f"Translation file exists: {filepath_translation}")
+            translation = Project.safe_read(filepath_translation, type_)
+            if not translation:
+                translation_flag = False
 
         return process_function(
             filepath=filepath,
@@ -125,16 +139,20 @@ class Conversion:
                 )
 
                 if reference_flag:
-                    for line_ in reference:
-                        if line_.startswith(f"{key}="):
-                            data.context = f"{data.context}\n{line_.split('=', 1)[1]}"
-                            break
+                    potential_context = [
+                        f"{data.context}\n{line_.split('=', 1)[1]}"
+                        for line_ in reference
+                        if line_.startswith(f"{key}=")
+                    ]
+                    data.context = potential_context[0] if potential_context else data.context
 
                 if translation_flag:
-                    for line_ in translation:
-                        if line_.startswith(f"{key}="):
-                            data.translation = f"{line_.split('=', 1)[1].strip()}"
-                            break
+                    potential_translation = [
+                        f"{line_.split('=', 1)[1].strip()}"
+                        for line_ in translation
+                        if line_.startswith(f"{key}=")
+                    ]
+                    data.context = potential_translation[0] if potential_translation else data.context
 
                 result.append(data)
 
@@ -146,6 +164,7 @@ class Conversion:
                     newkey, newvalue = line_.split("=", 1)
                     if newkey in {_.key for _ in result}:
                         continue
+                    logger.debug(f"Translation has new key-values: {newkey}={newvalue}")
 
                     data = Data(
                         key=newkey,
@@ -161,6 +180,7 @@ class Conversion:
                                 break
 
                     result.append(data)
+
             return result
 
         return self._convert_general(
@@ -192,6 +212,27 @@ class Conversion:
                 if translation_flag:
                     data.translation = translation.get(key, "")
                 result.append(data)
+
+            # some keys not exist in original but do exist in translation
+            if translation_flag:
+                for key, value in translation.items():
+                    if key in original:
+                        continue
+                    logger.debug(f"Translation has new key-values: {key}={value}")
+
+                    data = Data(
+                        key=key,
+                        original="MISSING",
+                        translation=value,
+                        context="Additional in translation"
+                    )
+
+                    if reference_flag:
+                        if key in reference:
+                            data.context = f"{data.context}\n{reference[key]}"
+
+                    result.append(data)
+
             return result
 
         return self._convert_general(
@@ -254,8 +295,10 @@ class Conversion:
             translation: list[str] = kwargs["translation"]
             
             if reference_flag and len(original) != len(reference):
+                logger.warning(f"Reference length {len(reference)} not equal to original {len(original)} <- {filepath}")
                 reference_flag = False
             if translation_flag and len(original) != len(translation):
+                logger.warning(f"Translation length {len(translation)} not equal to original {len(original)} <- {filepath}")
                 translation_flag = False
 
             result = []
@@ -387,6 +430,7 @@ class Conversion:
 class Restoration:
     def restore(self):
         """paratranz jsons to local raw texts"""
+        logger.info("======= RESTORATION START =======")
         for root, dirs, files in os.walk(settings.filepath.root / settings.filepath.download):
             for file in files:
                 filepath = Path(root) / file
@@ -397,22 +441,25 @@ class Restoration:
 
                 file_type = Project.categorize(relative_path)
 
-                try:
-                    match file_type:
-                        case FileType.LANG:
-                            self._restore_lang(converted_path, file_type)
-                        case FileType.JSON_LANG:
-                            self._restore_json_lang(converted_path, file_type)
-                        case _:
-                            self._restore_misc(converted_path, file_type)
-                except FileNotFoundError as e:
-                    logger.error(f'File not exist: {converted_path}')
+                match file_type:
+                    case FileType.LANG:
+                        flag = self._restore_lang(converted_path, file_type)
+                    case FileType.JSON_LANG:
+                        flag = self._restore_json_lang(converted_path, file_type)
+                    case _:
+                        flag = self._restore_misc(converted_path, file_type)
+
+                if flag:
+                    logger.success(f"Restored successfully: {converted_path}")
+                else:
+                    logger.error(f"Restored failed: {converted_path}")
 
     @staticmethod
-    def _restore_general(filepath: Path, type_: FileType, process_function: Callable[..., "FileContent"], **kwargs):
+    def _restore_general(filepath: Path, type_: FileType, process_function: Callable[..., "FileContent"], **kwargs) -> bool:
         filepath_original = DIR_ORIGINAL / filepath.with_suffix("")
-        with open(filepath_original, "r", encoding="utf-8") as fp:
-            original = Project.read(fp, type_)
+        original = Project.safe_read(filepath_original, type_)
+        if not original:
+            return False
 
         filepath_download = settings.filepath.root / settings.filepath.download / filepath
         with open(filepath_download, "r", encoding="utf-8") as fp:
@@ -429,6 +476,7 @@ class Restoration:
         filepath_result = (settings.filepath.root / settings.filepath.result / filepath.parent / filename_translation) if filename_translation else (settings.filepath.root / settings.filepath.result / filepath.with_suffix(""))
         with open(filepath_result, "w", encoding="utf-8") as fp:
             Project.write(content=result, fp=fp, type_=type_)
+        return True
 
     def _restore_lang(self, filepath: Path, type_: FileType):
         def _process(**kwargs) -> "FileContent":
@@ -629,14 +677,17 @@ class Project:
             with suppress(FileNotFoundError):
                 shutil.rmtree(filepath)
             os.makedirs(filepath, exist_ok=True)
+            logger.debug(f"Cleaned {filepath}")
 
     @staticmethod
     def categorize(filepath: Path) -> FileType:
         filepath_str = str(filepath)
         match filepath.name:
             case "en_US.lang" | "ru_RU.lang" | "zh_CN.lang":
+                logger.debug(f"{FileType.LANG} <- {filepath} ")
                 return FileType.LANG
             case "en_us.json" | "ru_ru.json" | "zh_cn.json":
+                logger.debug(f"{FileType.JSON_LANG} <- {filepath} ")
                 return FileType.JSON_LANG
             case _:
                 pass
@@ -644,10 +695,13 @@ class Project:
         suffix = filepath.suffix or Path(f" {filepath.name}").suffix
         match suffix:
             case ".lang":
+                logger.debug(f"{FileType.LANG} <- {filepath} ")
                 return FileType.LANG
             case ".txt":
                 if "lore" in filepath_str:
+                    logger.debug(f"{FileType.PLAINTEXT} <- {filepath} ")
                     return FileType.PLAINTEXT
+                logger.debug(f"{FileType.PLAINTEXT_IN_LINES} <- {filepath} ")
                 return FileType.PLAINTEXT_IN_LINES
             case _:
                 pass
@@ -655,16 +709,37 @@ class Project:
         """ special """
         if "CustomNPCs" in filepath_str:
             if "dialogs" in filepath_str:
+                logger.debug(f"{FileType.CUSTOM_NPCS_DIALOGS} <- {filepath} ")
                 return FileType.CUSTOM_NPCS_DIALOGS
             elif "quests" in filepath_str:
+                logger.debug(f"{FileType.CUSTOM_NPCS_QUESTS} <- {filepath} ")
                 return FileType.CUSTOM_NPCS_QUESTS
 
         if "lotr" in filepath_str.lower():
             if "speech" in filepath_str:
                 if filepath.suffix == ".json":
+                    logger.debug(f"{FileType.LOTR_RENEWED_SPEECH} <- {filepath} ")
                     return FileType.LOTR_RENEWED_SPEECH
 
+        logger.error(f"Unknown file type: {filepath}")
         raise Exception(f"Unknown file type: {filepath}")
+
+    @staticmethod
+    def safe_read(filepath: Path, type_: FileType) -> FileContent | None:
+        try:
+            with open(filepath, "r", encoding="utf-8") as fp:
+                return Project.read(fp, type_)
+        except FileNotFoundError as e:
+            logger.error(f"File not found: {filepath}")
+            return None
+
+        except UnicodeDecodeError as e:
+            logger.warning(f"File encoding is not utf-8: {filepath}")
+            if not Project.change_encoding(filepath):
+                return None
+
+            with open(filepath, "r", encoding="utf-8") as fp:
+                return Project.read(fp, type_)
 
     @staticmethod
     def read(fp: io.TextIOBase, type_: FileType) -> list[str] | str | list | dict:
@@ -687,33 +762,27 @@ class Project:
                 fp.write(content)
 
     @staticmethod
-    def wash_encoding():
-        for root, dirs, files in os.walk(settings.filepath.root / settings.filepath.source):
-            for file in files:
-                filepath = Path(root) / file
-                try:
-                    with open(filepath, "r", encoding="utf-8") as fp:
-                        fp.read()
-                except UnicodeDecodeError as e:
-                    Project.change_encoding(filepath)
-
-    @staticmethod
-    def change_encoding(filepath: Path):
+    def change_encoding(filepath: Path) -> bool:
         with open(filepath, "rb") as fp:
             encoding = chardet.detect(fp.read())
 
         encoding, confidence, language = encoding["encoding"], encoding["confidence"], encoding["language"]
-        if encoding != "utf-8":
-            logger.warning(f"not utf-8: {encoding}(prob: {confidence}, lang: {language}) | {filepath}")
+        if encoding == "utf-8":
+            logger.warning(f"Encoding detecting failed, skipping {filepath}")
+            return False
+        
+        logger.warning(f"Probably encoding: {encoding}(confidence: {confidence}, language: {language}) <- {filepath}")
+        if confidence < 0.5:
+            logger.warning(f"Confidence too low ({confidence} < 50%), skipping")
+            return False
 
-            if confidence < 0.5:
-                return
+        with open(filepath, "r", encoding=encoding) as fp:
+            content = fp.read()
 
-            with open(filepath, "r", encoding=encoding) as fp:
-                content = fp.read()
-
-            with open(filepath, "w", encoding="utf-8") as fp:
-                fp.write(content)
+        with open(filepath, "w", encoding="utf-8") as fp:
+            fp.write(content)
+        logger.info(f"Encoding successfully changed to utf-8: {filepath}")
+        return True
 
     @property
     def convert(self):

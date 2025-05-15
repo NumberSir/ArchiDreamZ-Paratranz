@@ -11,7 +11,7 @@ def main():
         settings.filepath.root / settings.filepath.converted,
         settings.filepath.root / settings.filepath.download,
         settings.filepath.root / settings.filepath.result,
-        settings.filepath.root / settings.filepath.tmp
+        settings.filepath.root / settings.filepath.tmp,
     )
     # project.wash_encoding()
     project.convert()
