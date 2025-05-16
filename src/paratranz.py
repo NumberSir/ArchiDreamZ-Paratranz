@@ -58,15 +58,14 @@ class Paratranz:
         headers = {**self.headers, 'Content-Type': 'multipart/form-data'}
         data = {"file": bytearray(file, "utf-8")}
         response = self.client.post(url, headers=headers, data=data)
-        logger.debug(response.url)
-        logger.info(f"file updated: {response.json()}")
+        logger.success(f"file updated: {response.json()}")
 
     def _create_file(self, file: str, path: Path):
         url = f"{self.base_url}/projects/{self.project_id}/files"
         headers = {**self.headers, 'Content-Type': 'multipart/form-data'}
         data = {"file": bytearray(file, "utf-8"), "path": path.__str__()}
         response = self.client.post(url, headers=headers, data=data)
-        logger.info(f"file created: {response.json()}")
+        logger.success(f"file created: {response.json()}")
 
     def download(self):
         logger.info("Starting downloading files from Paratranz...")
@@ -84,7 +83,11 @@ class Paratranz:
 
     def _download_artifacts(self):
         url = f"{self.base_url}/projects/{self.project_id}/artifacts/download"
-        content = (self.client.get(url, headers=self.headers, follow_redirects=True)).content
+        try:
+            content = (self.client.get(url, headers=self.headers, follow_redirects=True)).content
+        except httpx.ConnectError as e:
+            logger.error(f"Error downloading artifacts: {e}")
+            raise
         with open(settings.filepath.root / settings.filepath.tmp / "paratranz_export.zip", "wb") as fp:
             fp.write(content)
 
