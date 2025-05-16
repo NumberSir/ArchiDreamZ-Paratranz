@@ -113,6 +113,7 @@ class Conversion:
             **kwargs
         )
 
+    """ LANG """
     def _convert_lang(self, filepath: Path, type_: FileType) -> list[Data]:
         """old versions"""
         def _process(**kwargs) -> list[Data]:
@@ -248,6 +249,7 @@ class Conversion:
             filename_translation="zh_cn.json",
         )
 
+    """ MISC """
     def _convert_misc(self, filepath: Path, type_: FileType) -> list[Data]:
         """plaintext, generally"""
         match type_:
@@ -255,18 +257,8 @@ class Conversion:
                 return self._convert_misc_plaintext(filepath, type_)
             case FileType.PLAINTEXT_IN_LINES:
                 return self._convert_misc_plaintext_in_lines(filepath, type_)
-            case FileType.CUSTOM_NPCS_DIALOGS:
-                return self._convert_misc_customnpcs_dialog(filepath, type_)
-            case FileType.CUSTOM_NPCS_QUESTS:
-                return self._convert_misc_customnpcs_quests(filepath, type_)
-            case FileType.LOTR_RENEWED_SPEECH:
-                return self._convert_misc_lotr_renewed_speech(filepath, type_)
-            case FileType.LOTR_LEGACY_NAMES:
-                return self._convert_misc_lotr_legacy_names(filepath, type_)
-            case FileType.LOTR_LEGACY_SPEECH:
-                return self._convert_misc_lotr_legacy_speech(filepath, type_)
             case _:
-                raise Exception(f"Unknown file type when convert: {filepath}")
+                return self._convert_special(filepath, type_)
 
     def _convert_misc_plaintext(self, filepath: Path, type_: FileType) -> list[Data]:
         """plaintext, whole file"""
@@ -333,6 +325,22 @@ class Conversion:
             type_=type_,
             process_function=_process,
         )
+
+    """ SPECIAL """
+    def _convert_special(self, filepath: Path, type_: FileType) -> list[Data]:
+        match type_:
+            case FileType.CUSTOM_NPCS_DIALOGS:
+                return self._convert_misc_customnpcs_dialog(filepath, type_)
+            case FileType.CUSTOM_NPCS_QUESTS:
+                return self._convert_misc_customnpcs_quests(filepath, type_)
+            case FileType.LOTR_RENEWED_SPEECH:
+                return self._convert_misc_lotr_renewed_speech(filepath, type_)
+            case FileType.LOTR_LEGACY_NAMES:
+                return self._convert_misc_lotr_legacy_names(filepath, type_)
+            case FileType.LOTR_LEGACY_SPEECH:
+                return self._convert_misc_lotr_legacy_speech(filepath, type_)
+            case _:
+                raise Exception(f"Unknown file type when convert: {filepath}")
 
     def _convert_misc_customnpcs_dialog(self, filepath: Path, type_: FileType) -> list[Data]:
         def _process(**kwargs) -> list[Data]:
@@ -495,6 +503,7 @@ class Restoration:
             Project.write(content=result, fp=fp, type_=type_)
         return True
 
+    """ LANG """
     def _restore_lang(self, filepath: Path, type_: FileType):
         def _process(**kwargs) -> "FileContent":
             download: list[dict] = kwargs["download"]
@@ -540,6 +549,7 @@ class Restoration:
             filename_translation="zh_cn.json"
         )
 
+    """ MISC """
     def _restore_misc(self, filepath: Path, type_: FileType):
         """plaintext, generally"""
         match type_:
@@ -547,18 +557,8 @@ class Restoration:
                 return self._restore_misc_plaintext(filepath, type_)
             case FileType.PLAINTEXT_IN_LINES:
                 return self._restore_misc_plaintext_in_lines(filepath, type_)
-            case FileType.CUSTOM_NPCS_DIALOGS:
-                return self._restore_misc_customnpcs_dialog(filepath, type_)
-            case FileType.CUSTOM_NPCS_QUESTS:
-                return self._restore_misc_customnpcs_quests(filepath, type_)
-            case FileType.LOTR_RENEWED_SPEECH:
-                return self._restore_misc_lotr_renewed_speech(filepath, type_)
-            case FileType.LOTR_LEGACY_NAMES:
-                return self._restore_misc_lotr_legacy_names(filepath, type_)
-            case FileType.LOTR_LEGACY_SPEECH:
-                return self._restore_misc_lotr_legacy_speech(filepath, type_)
             case _:
-                raise Exception(f"Unknown file type when restore: {filepath}")
+                return self._restore_special(filepath, type_)
 
     def _restore_misc_plaintext(self, filepath: Path, type_: FileType):
         def _process(**kwargs) -> "FileContent":
@@ -591,6 +591,22 @@ class Restoration:
             type_=type_,
             process_function=_process,
         )
+
+    """ SPECIAL """
+    def _restore_special(self, filepath: Path, type_: FileType):
+        match type_:
+            case FileType.CUSTOM_NPCS_DIALOGS:
+                return self._restore_misc_customnpcs_dialog(filepath, type_)
+            case FileType.CUSTOM_NPCS_QUESTS:
+                return self._restore_misc_customnpcs_quests(filepath, type_)
+            case FileType.LOTR_RENEWED_SPEECH:
+                return self._restore_misc_lotr_renewed_speech(filepath, type_)
+            case FileType.LOTR_LEGACY_NAMES:
+                return self._restore_misc_lotr_legacy_names(filepath, type_)
+            case FileType.LOTR_LEGACY_SPEECH:
+                return self._restore_misc_lotr_legacy_speech(filepath, type_)
+            case _:
+                raise Exception(f"Unknown file type when convert: {filepath}")
 
     def _restore_misc_customnpcs_dialog(self, filepath: Path, type_: FileType):
         def _process(**kwargs) -> "FileContent":
@@ -829,5 +845,7 @@ class Project:
 
 
 __all__ = [
-    "Project"
+    "Project",
+    "Conversion",
+    "Restoration"
 ]
