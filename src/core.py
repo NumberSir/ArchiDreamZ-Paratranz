@@ -49,6 +49,10 @@ class Conversion:
     def convert(self):
         """local raw texts to paratranz jsons"""
         logger.info("======= CONVERSION START =======")
+        if not DIR_ORIGINAL.exists():
+            logger.error(f"{DIR_ORIGINAL} does not exist!")
+            raise Exception(f"{DIR_ORIGINAL} does not exist!")
+
         for root, dirs, files in os.walk(DIR_ORIGINAL):
             for file in files:
                 filepath = Path(root) / file
@@ -462,6 +466,7 @@ class Restoration:
                 converted_path = relative_path.parent / f"{relative_path.name}.json"
                 os.makedirs(settings.filepath.root / settings.filepath.result / relative_path.parent, exist_ok=True)
 
+                logger.debug(f"Restoring {relative_path}")
                 file_type = Project.categorize(relative_path)
                 if not file_type:
                     continue
