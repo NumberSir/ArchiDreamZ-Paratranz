@@ -12,6 +12,7 @@ from src.log import logger
 
 class Paratranz:
     def __init__(self, client: httpx.Client):
+        logger.info("")
         logger.info("======= PARATRANZ START =======")
         self._client = client
         self._base_url = "https://paratranz.cn/api"
@@ -58,17 +59,17 @@ class Paratranz:
         headers = {**self.headers, 'Content-Type': 'multipart/form-data'}
         data = {"file": bytearray(file, "utf-8")}
         response = self.client.post(url, headers=headers, data=data)
-        logger.success(f"file updated: {response.json()}")
+        logger.bind(filepath=response.json()).success("Updated file successfully")
 
     def _create_file(self, file: str, path: Path):
         url = f"{self.base_url}/projects/{self.project_id}/files"
         headers = {**self.headers, 'Content-Type': 'multipart/form-data'}
         data = {"file": bytearray(file, "utf-8"), "path": path.__str__()}
         response = self.client.post(url, headers=headers, data=data)
-        logger.success(f"file created: {response.json()}")
+        logger.bind(filepath=response.json()).success("Created file successfully")
 
     def download(self):
-        logger.info("Starting downloading files from Paratranz...")
+        logger.info("Starting to download translated files...")
         os.makedirs(settings.filepath.root / settings.filepath.tmp, exist_ok=True)
         os.makedirs(settings.filepath.root / settings.filepath.download, exist_ok=True)
         with contextlib.suppress(httpx.TimeoutException):

@@ -12,6 +12,7 @@ from typing import Callable
 import chardet
 
 from src.config import settings
+from src.exception import ProjectStructureException, UnknownFileTypeException
 from src.log import logger
 
 # from src.libs.openapi_client import ApiClient as ParatranzClient, FilesApi, Configuration
@@ -48,10 +49,11 @@ class FileType(Enum):
 class Conversion:
     def convert(self):
         """local raw texts to paratranz jsons"""
+        logger.info("")
         logger.info("======= CONVERSION START =======")
         if not DIR_ORIGINAL.exists():
-            logger.error(f"{DIR_ORIGINAL} does not exist!")
-            raise Exception(f"{DIR_ORIGINAL} does not exist!")
+            logger.bind(filepath=DIR_ORIGINAL).error("Filepath does not exist!")
+            raise ProjectStructureException(DIR_ORIGINAL)
 
         for root, dirs, files in os.walk(DIR_ORIGINAL):
             for file in files:
@@ -60,7 +62,7 @@ class Conversion:
                 converted_path = relative_path.parent / f"{relative_path.name}.json"
                 os.makedirs(settings.filepath.root / settings.filepath.converted / relative_path.parent, exist_ok=True)
 
-                logger.debug(f"Converting {relative_path}")
+                logger.bind(filepath=relative_path).debug("Converting file")
                 file_type = Project.categorize(relative_path)
                 if not file_type:
                     continue
@@ -74,13 +76,15 @@ class Conversion:
                         datas = self._convert_misc(relative_path, file_type)
                 
                 if datas is None:
-                    logger.warning(f"Converting failed: {relative_path}")
+                    logger.bind(filepath=relative_path).warning("Converting file failed")
                     return
 
                 with open(settings.filepath.root / settings.filepath.converted / converted_path, "w", encoding="utf-8") as fp:
                     json.dump([asdict(_) for _ in datas], fp, ensure_ascii=False, indent=2)
-                logger.success(f"Converted successfully: {relative_path}")
-                logger.debug(f"Total keys: {len(datas)}")
+                logger.bind(filepath=relative_path).debug("Converting file successfully")
+
+            if Path(root).parent == DIR_ORIGINAL:
+                logger.bind(filepath=Path(root).name).success("Converting mod successfully")
 
     @staticmethod
     def _convert_general(filepath: Path, type_: FileType, process_function: Callable[..., list[Data]], **kwargs) -> list[Data] | None:
@@ -93,7 +97,7 @@ class Conversion:
         filename_reference: str | None = kwargs.get("filename_reference", None)
         filepath_reference = (DIR_REFERENCE / filepath.parent / filename_reference) if filename_reference else (DIR_REFERENCE / filepath)
         if reference_flag := filepath_reference.exists():
-            logger.debug(f"Reference file exists: {filepath_reference}")
+            logger.bind(filepath=filepath_reference.relative_to(DIR_REFERENCE)).debug("Reference file exists")
             reference = Project.safe_read(filepath_reference, type_)
             if not reference:
                 reference_flag = False
@@ -102,7 +106,7 @@ class Conversion:
         filename_translation: str | None = kwargs.get("filename_translation", None)
         filepath_translation = (DIR_TRANSLATION / filepath.parent / filename_translation) if filename_translation else (DIR_TRANSLATION / filepath)
         if translation_flag := filepath_translation.exists():
-            logger.debug(f"Translation file exists: {filepath_translation}")
+            logger.bind(filepath=filepath_translation.relative_to(DIR_TRANSLATION)).debug("Translation file exists")
             translation = Project.safe_read(filepath_translation, type_)
             if not translation:
                 translation_flag = False
@@ -300,10 +304,10 @@ class Conversion:
             translation: list[str] = kwargs["translation"]
             
             if reference_flag and len(original) != len(reference):
-                logger.warning(f"Reference length {len(reference)} not equal to original {len(original)} <- {filepath}")
+                logger.bind(filepath=filepath).warning(f"Reference length inequal ({len(reference)}/{len(original)})")
                 reference_flag = ignore_length_unequal
             if translation_flag and len(original) != len(translation):
-                logger.warning(f"Translation length {len(translation)} not equal to original {len(original)} <- {filepath}")
+                logger.bind(filepath=filepath).warning(f"Translation length inequal({len(translation)}/{len(original)})")
                 translation_flag = ignore_length_unequal
 
             result = []
@@ -344,7 +348,8 @@ class Conversion:
             case FileType.LOTR_LEGACY_SPEECH:
                 return self._convert_misc_lotr_legacy_speech(filepath, type_)
             case _:
-                raise Exception(f"Unknown file type when convert: {filepath}")
+                logger.bind(filepath=filepath).error("Unknown file type when convert")
+                raise UnknownFileTypeException(filepath)
 
     def _convert_misc_customnpcs_dialog(self, filepath: Path, type_: FileType) -> list[Data]:
         def _process(**kwargs) -> list[Data]:
@@ -457,6 +462,7 @@ class Conversion:
 class Restoration:
     def restore(self):
         """paratranz jsons to local raw texts"""
+        logger.info("")
         logger.info("======= RESTORATION START =======")
         for root, dirs, files in os.walk(settings.filepath.root / settings.filepath.download):
             for file in files:
@@ -466,7 +472,7 @@ class Restoration:
                 converted_path = relative_path.parent / f"{relative_path.name}.json"
                 os.makedirs(settings.filepath.root / settings.filepath.result / relative_path.parent, exist_ok=True)
 
-                logger.debug(f"Restoring {relative_path}")
+                logger.bind(filepath=converted_path).debug("Restoring file")
                 file_type = Project.categorize(relative_path)
                 if not file_type:
                     continue
@@ -480,9 +486,12 @@ class Restoration:
                         flag = self._restore_misc(converted_path, file_type)
 
                 if flag:
-                    logger.success(f"Restored successfully: {converted_path}")
+                    logger.bind(filepath=converted_path).debug("Restoring file successfully")
                 else:
-                    logger.error(f"Restored failed: {converted_path}")
+                    logger.bind(filepath=converted_path).error("Restoring file failed")
+
+            if Path(root).parent == settings.filepath.root / settings.filepath.download:
+                logger.bind(filepath=Path(root).name).success("Restoring mod successfully")
 
     @staticmethod
     def _restore_general(filepath: Path, type_: FileType, process_function: Callable[..., "FileContent"], **kwargs) -> bool:
@@ -543,7 +552,7 @@ class Restoration:
 
             for data in download:
                 if data["key"] not in original:
-                    logger.warning(f"File might not be consistent: {filepath_.with_suffix('')}")
+                    logger.bind(filepath=filepath).warning("Extra keys in translation")
                 original[data["key"]] = data['translation'] or data['original']
             return original
 
@@ -611,7 +620,7 @@ class Restoration:
             case FileType.LOTR_LEGACY_SPEECH:
                 return self._restore_misc_lotr_legacy_speech(filepath, type_)
             case _:
-                raise Exception(f"Unknown file type when convert: {filepath}")
+                raise UnknownFileTypeException(filepath)
 
     def _restore_misc_customnpcs_dialog(self, filepath: Path, type_: FileType):
         def _process(**kwargs) -> "FileContent":
@@ -725,7 +734,7 @@ class Project:
             with suppress(FileNotFoundError):
                 shutil.rmtree(filepath)
             os.makedirs(filepath, exist_ok=True)
-            logger.debug(f"Cleaned {filepath}")
+            logger.bind(filepath=filepath).debug("Filepath cleaned")
 
     @staticmethod
     def categorize(filepath: Path) -> FileType | None:
@@ -735,49 +744,49 @@ class Project:
         """ special """
         if "CustomNPCs" in filepath_str:
             if "dialogs" in filepath_str:
-                logger.debug(f"{FileType.CUSTOM_NPCS_DIALOGS} <- {filepath} ")
+                logger.bind(filepath=filepath).debug(f"Type: {FileType.CUSTOM_NPCS_DIALOGS.name}")
                 return FileType.CUSTOM_NPCS_DIALOGS
             if "quests" in filepath_str:
-                logger.debug(f"{FileType.CUSTOM_NPCS_QUESTS} <- {filepath} ")
+                logger.bind(filepath=filepath).debug(f"Type: {FileType.CUSTOM_NPCS_QUESTS.name}")
                 return FileType.CUSTOM_NPCS_QUESTS
 
         if "lotr" in filepath_str_lower:
             if "speech" in filepath_str:
                 if suffix == ".json":
-                    logger.debug(f"{FileType.LOTR_RENEWED_SPEECH} <- {filepath} ")
+                    logger.bind(filepath=filepath).debug(f"Type: {FileType.LOTR_RENEWED_SPEECH.name}")
                     return FileType.LOTR_RENEWED_SPEECH
                 if suffix == ".txt":
-                    logger.debug(f"{FileType.LOTR_LEGACY_SPEECH} <- {filepath} ")
+                    logger.bind(filepath=filepath).debug(f"Type: {FileType.LOTR_LEGACY_SPEECH.name}")
                     return FileType.LOTR_LEGACY_SPEECH
 
             if "names" in filepath_str:
-                logger.debug(f"{FileType.LOTR_LEGACY_NAMES} <- {filepath} ")
+                logger.bind(filepath=filepath).debug(f"Type: {FileType.LOTR_LEGACY_NAMES.name}")
                 return FileType.LOTR_LEGACY_NAMES
 
         match filepath.name:
             case "en_US.lang" | "ru_RU.lang" | "zh_CN.lang":
-                logger.debug(f"{FileType.LANG} <- {filepath} ")
+                logger.bind(filepath=filepath).debug(f"Type: {FileType.LANG.name}")
                 return FileType.LANG
             case "en_us.json" | "ru_ru.json" | "zh_cn.json":
-                logger.debug(f"{FileType.JSON_LANG} <- {filepath} ")
+                logger.bind(filepath=filepath).debug(f"Type: {FileType.JSON_LANG.name}")
                 return FileType.JSON_LANG
             case _:
                 pass
 
         match suffix:
             case ".lang":
-                logger.debug(f"{FileType.LANG} <- {filepath} ")
+                logger.bind(filepath=filepath).debug(f"Type: {FileType.LANG.name}")
                 return FileType.LANG
             case ".txt":
                 if "lore" in filepath_str:
-                    logger.debug(f"{FileType.PLAINTEXT} <- {filepath} ")
+                    logger.bind(filepath=filepath).debug(f"Type: {FileType.PLAINTEXT.name}")
                     return FileType.PLAINTEXT
-                logger.debug(f"{FileType.PLAINTEXT_IN_LINES} <- {filepath} ")
+                logger.bind(filepath=filepath).debug(f"Type: {FileType.PLAINTEXT_IN_LINES.name}")
                 return FileType.PLAINTEXT_IN_LINES
             case _:
                 pass
 
-        logger.error(f"Unknown file type: {filepath}")
+        logger.bind(filepath=filepath).error("Unknown filetype when categorize")
         return None
 
     @staticmethod
@@ -786,11 +795,11 @@ class Project:
             with open(filepath, "r", encoding="utf-8") as fp:
                 return Project.read(fp, type_)
         except FileNotFoundError as e:
-            logger.error(f"File not found: {filepath}")
+            logger.bind(filepath=filepath).error("File not found when reading")
             return None
 
         except UnicodeDecodeError as e:
-            logger.warning(f"File encoding is not utf-8: {filepath}")
+            logger.bind(filepath=filepath).warning("File encoding is not utf-8")
             if not Project.change_encoding(filepath):
                 return None
 
@@ -824,12 +833,12 @@ class Project:
 
         encoding, confidence, language = encoding["encoding"], encoding["confidence"], encoding["language"]
         if encoding == "utf-8":
-            logger.warning(f"Encoding detecting failed, skipping {filepath}")
+            logger.bind(filepath=filepath).warning("Encoding detecting failed, file skipped")
             return False
-        
-        logger.warning(f"Probably encoding: {encoding}(confidence: {confidence}, language: {language}) <- {filepath}")
+
+        logger.bind(filepath=filepath).warning(f"Probably encoding: {encoding}({confidence*100:.2f}% {language})")
         if confidence < 0.5:
-            logger.warning(f"Confidence too low ({confidence} < 50%), skipping")
+            logger.bind(filepath=filepath).warning(f"Confidence too low ({confidence*100:.2f}%<50%), file skipped")
             return False
 
         with open(filepath, "r", encoding=encoding) as fp:
@@ -837,7 +846,7 @@ class Project:
 
         with open(filepath, "w", encoding="utf-8") as fp:
             fp.write(content)
-        logger.info(f"Encoding successfully changed to utf-8: {filepath}")
+        logger.bind(filepath=filepath).success("Encoding successfully changed to utf-8")
         return True
 
     @property

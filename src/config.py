@@ -13,7 +13,7 @@ class ProjectSettings(BaseSettings):
 
     name: str = Field(default="SugarCube2-Localization")
     log_level: str = Field(default="INFO")
-    log_format: str = Field(default="<g>{time:HH:mm:ss}</g> | [<lvl>{level}</lvl>] | {message}")
+    log_format: str = Field(default="<g>{time:HH:mm:ss}</g> | [<lvl>{level:^7}</lvl>] | {message:<32}{extra[filepath]}")
     language: str = Field(default="zh_cn")
 
 
