@@ -492,8 +492,10 @@ class Restoration:
                 else:
                     logger.bind(filepath=converted_path).error("Restoring file failed")
 
-            if Path(root).parent == settings.filepath.root / settings.filepath.download:
-                logger.bind(filepath=Path(root).name).success("Restoring mod successfully")
+            if Path(root).parent.parent == settings.filepath.root / settings.filepath.download:
+                logger.bind(filepath=Path(root).relative_to(settings.filepath.root / settings.filepath.download)).success("Restoring mod folder successfully")
+            elif Path(root).parent ==  settings.filepath.root / settings.filepath.download:
+                logger.bind(filepath=Path(root).name).success("Restoring mod successfully.")
 
     @staticmethod
     def _restore_general(filepath: Path, type_: FileType, process_function: Callable[..., "FileContent"], **kwargs) -> bool:
