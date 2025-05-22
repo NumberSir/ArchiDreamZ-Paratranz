@@ -304,10 +304,10 @@ class Conversion:
             translation: list[str] = kwargs["translation"]
             
             if reference_flag and len(original) != len(reference):
-                logger.bind(filepath=filepath).warning(f"Reference length inequal ({len(reference)}/{len(original)})")
+                logger.bind(filepath=filepath).warning(f"Reference length inequal ({len(original)}/{len(reference)})")
                 reference_flag = ignore_length_unequal
             if translation_flag and len(original) != len(translation):
-                logger.bind(filepath=filepath).warning(f"Translation length inequal({len(translation)}/{len(original)})")
+                logger.bind(filepath=filepath).warning(f"Translation length inequal({len(original)}/{len(translation)})")
                 translation_flag = ignore_length_unequal
 
             result = []
