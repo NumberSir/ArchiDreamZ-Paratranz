@@ -55,7 +55,7 @@ class Conversion:
             logger.bind(filepath=DIR_ORIGINAL).error("Filepath does not exist!")
             raise ProjectStructureException(DIR_ORIGINAL)
 
-        for root, dirs, files in os.walk(DIR_ORIGINAL):
+        for root, dirs, files in os.walk(DIR_ORIGINAL, topdown=False):
             for file in files:
                 filepath = Path(root) / file
                 relative_path = filepath.relative_to(DIR_ORIGINAL)
@@ -83,8 +83,10 @@ class Conversion:
                     json.dump([asdict(_) for _ in datas], fp, ensure_ascii=False, indent=2)
                 logger.bind(filepath=relative_path).debug("Converting file successfully")
 
-            if Path(root).parent == DIR_ORIGINAL:
-                logger.bind(filepath=Path(root).name).success("Converting mod successfully")
+            if Path(root).parent.parent == DIR_ORIGINAL:
+                logger.bind(filepath=Path(root).relative_to(DIR_ORIGINAL)).success("Converting mod folder successfully")
+            elif Path(root).parent == DIR_ORIGINAL:
+                logger.bind(filepath=Path(root).name).success("Converting mod successfully.")
 
     @staticmethod
     def _convert_general(filepath: Path, type_: FileType, process_function: Callable[..., list[Data]], **kwargs) -> list[Data] | None:
@@ -464,7 +466,7 @@ class Restoration:
         """paratranz jsons to local raw texts"""
         logger.info("")
         logger.info("======= RESTORATION START =======")
-        for root, dirs, files in os.walk(settings.filepath.root / settings.filepath.download):
+        for root, dirs, files in os.walk(settings.filepath.root / settings.filepath.download, topdown=False):
             for file in files:
                 filepath = Path(root) / file
                 relative_path = filepath.relative_to(settings.filepath.root / settings.filepath.download)
