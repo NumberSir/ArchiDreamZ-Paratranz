@@ -166,7 +166,7 @@ class Conversion:
                         for line_ in translation
                         if line_.startswith(f"{key}=")
                     ]
-                    data.context = potential_translation[0] if potential_translation else data.context
+                    data.translation = potential_translation[0] if potential_translation else data.translation
 
                 result.append(data)
 
