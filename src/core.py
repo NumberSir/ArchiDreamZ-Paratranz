@@ -172,6 +172,30 @@ class Conversion:
 
                 result.append(data)
 
+            # some keys not exist in original but do exist in reference
+            if reference_flag:
+                for line_ in reference:
+                    if "=" not in line_:
+                        continue
+                    newkey, newvalue = line_.split("=", 1)
+                    if newkey in {_.key for _ in result}:
+                        continue
+                    logger.debug(f"Reference has new key-values: {newkey}={newvalue}")
+
+                    data = Data(
+                        key=newkey,
+                        original=newvalue,
+                        translation="",
+                        context="Additional in reference"
+                    )
+
+                    if translation_flag:
+                        for line_r in translation:
+                            if line_r.startswith(f"{newkey}="):
+                                data.context = f"{data.context}\n{line_r.split('=', 1)[1]}"
+                                break
+                    result.append(data)
+
             # some keys not exist in original but do exist in translation
             if translation_flag:
                 for line_ in translation:
@@ -194,7 +218,6 @@ class Conversion:
                             if line_r.startswith(f"{newkey}="):
                                 data.context = f"{data.context}\n{line_r.split('=', 1)[1]}"
                                 break
-
                     result.append(data)
 
             return result
@@ -229,6 +252,24 @@ class Conversion:
                     data.translation = translation.get(key, "")
                 result.append(data)
 
+            # some keys not exist in original but do exist in reference
+            if reference_flag:
+                for key, value in reference.items():
+                    if key in original:
+                        continue
+                    logger.debug(f"Reference has new key-values: {key}={value}")
+
+                    data = Data(
+                        key=key,
+                        original=value,
+                        translation="",
+                        context="Additional in reference"
+                    )
+
+                    if translation_flag and key in translation:
+                        data.context = f"{data.context}\n{translation[key]}"
+                    result.append(data)
+
             # some keys not exist in original but do exist in translation
             if translation_flag:
                 for key, value in translation.items():
@@ -242,13 +283,10 @@ class Conversion:
                         translation=value,
                         context="Additional in translation"
                     )
-
-                    if reference_flag:
-                        if key in reference:
-                            data.context = f"{data.context}\n{reference[key]}"
-
+                    if reference_flag and key in reference:
+                        data.context = f"{data.context}\n{reference[key]}"
                     result.append(data)
-
+                    
             return result
 
         return self._convert_general(
@@ -309,7 +347,7 @@ class Conversion:
                 logger.bind(filepath=filepath).warning(f"Reference length inequal ({len(original)}/{len(reference)})")
                 reference_flag = ignore_length_unequal
             if translation_flag and len(original) != len(translation):
-                logger.bind(filepath=filepath).warning(f"Translation length inequal({len(original)}/{len(translation)})")
+                logger.bind(filepath=filepath).warning(f"Translation length inequal ({len(original)}/{len(translation)})")
                 translation_flag = ignore_length_unequal
 
             result = []
@@ -328,6 +366,34 @@ class Conversion:
                 if translation_flag:
                     data.translation = translation[idx] if len(translation) > idx+1 else ""
                 result.append(data)
+
+                if reference_flag and len(reference) > len(original):
+                    for idx_, line_ in enumerate(reference[len(original):]):
+                        newkey = f"{len(original)+idx_}-REFERENCE"
+                        if not line_.strip():
+                            newkey = f"BLANK-{newkey}"
+
+                        data = Data(
+                            key=newkey,
+                            original=line_,
+                            translation="",
+                            context="Additional in reference"
+                        )
+                        result.append(data)
+
+                if translation_flag and len(translation) > len(original):
+                    for idx_, line_ in enumerate(translation[len(original):]):
+                        newkey = f"{len(original)+idx_}-TRANSLATION"
+                        if not line_.strip():
+                            newkey = f"BLANK-{newkey}"
+
+                        data = Data(
+                            key=newkey,
+                            original="EXTRA",
+                            translation="line_",
+                            context="Additional in translation"
+                        )
+                        result.append(data)
             return result
 
         return self._convert_general(
