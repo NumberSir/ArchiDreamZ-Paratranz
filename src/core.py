@@ -390,7 +390,7 @@ class Conversion:
                         data = Data(
                             key=newkey,
                             original="EXTRA",
-                            translation="line_",
+                            translation=line_,
                             context="Additional in translation"
                         )
                         result.append(data)
