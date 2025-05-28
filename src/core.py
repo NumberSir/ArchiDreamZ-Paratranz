@@ -367,33 +367,33 @@ class Conversion:
                     data.translation = translation[idx] if len(translation) > idx+1 else ""
                 result.append(data)
 
-                if reference_flag and len(reference) > len(original):
-                    for idx_, line_ in enumerate(reference[len(original):]):
-                        newkey = f"{len(original)+idx_}-REFERENCE"
-                        if not line_.strip():
-                            newkey = f"BLANK-{newkey}"
+            if reference_flag and len(reference) > len(original):
+                for idx_, line_ in enumerate(reference[len(original):]):
+                    newkey = f"{len(original)+idx_}-REFERENCE"
+                    if not line_.strip():
+                        newkey = f"BLANK-{newkey}"
 
-                        data = Data(
-                            key=newkey,
-                            original=line_,
-                            translation="",
-                            context="Additional in reference"
-                        )
-                        result.append(data)
+                    data = Data(
+                        key=newkey,
+                        original=line_,
+                        translation="",
+                        context="Additional in reference"
+                    )
+                    result.append(data)
 
-                if translation_flag and len(translation) > len(original):
-                    for idx_, line_ in enumerate(translation[len(original):]):
-                        newkey = f"{len(original)+idx_}-TRANSLATION"
-                        if not line_.strip():
-                            newkey = f"BLANK-{newkey}"
+            if translation_flag and len(translation) > len(original):
+                for idx_, line_ in enumerate(translation[len(original):]):
+                    newkey = f"{len(original)+idx_}-TRANSLATION"
+                    if not line_.strip():
+                        newkey = f"BLANK-{newkey}"
 
-                        data = Data(
-                            key=newkey,
-                            original="EXTRA",
-                            translation=line_,
-                            context="Additional in translation"
-                        )
-                        result.append(data)
+                    data = Data(
+                        key=newkey,
+                        original="EXTRA",
+                        translation=line_,
+                        context="Additional in translation"
+                    )
+                    result.append(data)
             return result
 
         return self._convert_general(
