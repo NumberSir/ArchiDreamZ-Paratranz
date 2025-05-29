@@ -362,9 +362,9 @@ class Conversion:
                     translation=""
                 )
                 if reference_flag:
-                    data.context = reference[idx] if len(reference) > idx+1 else ""
+                    data.context = reference[idx] if len(reference) > idx else ""
                 if translation_flag:
-                    data.translation = translation[idx] if len(translation) > idx+1 else ""
+                    data.translation = translation[idx] if len(translation) > idx else ""
                 result.append(data)
 
             if reference_flag and len(reference) > len(original):
