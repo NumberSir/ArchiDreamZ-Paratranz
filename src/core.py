@@ -192,7 +192,7 @@ class Conversion:
                     if translation_flag:
                         for line_r in translation:
                             if line_r.startswith(f"{newkey}="):
-                                data.context = f"{data.context}\n{line_r.split('=', 1)[1]}"
+                                data.translation = line_r.split("=", 1)[1]
                                 break
                     result.append(data)
 
@@ -267,7 +267,7 @@ class Conversion:
                     )
 
                     if translation_flag and key in translation:
-                        data.context = f"{data.context}\n{translation[key]}"
+                        data.translation = translation[key]
                     result.append(data)
 
             # some keys not exist in original but do exist in translation
