@@ -366,8 +366,7 @@ class Conversion:
                 if translation_flag:
                     data.translation = translation[idx] if len(translation) > idx else ""
                     if replace_untranslated_with_blank and data.translation == data.original:
-                        data.key = f"BLANK-{idx}"
-                        data.original = data.translation = "\n"
+                        data.translation = "\n"
                 result.append(data)
 
             if reference_flag and len(reference) > len(original):
