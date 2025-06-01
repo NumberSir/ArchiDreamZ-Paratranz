@@ -334,7 +334,7 @@ class Conversion:
             process_function=_process,
         )
 
-    def _convert_misc_plaintext_in_lines(self, filepath: Path, type_: FileType, *, ignore_length_unequal: bool = False) -> list[Data]:
+    def _convert_misc_plaintext_in_lines(self, filepath: Path, type_: FileType, *, ignore_length_unequal: bool = False, replace_untranslated_with_blank: bool = False) -> list[Data]:
         """plaintext, split in lines"""
         def _process(**kwargs) -> list[Data]:
             original: list[str] = kwargs["original"]
@@ -365,6 +365,9 @@ class Conversion:
                     data.context = reference[idx] if len(reference) > idx else ""
                 if translation_flag:
                     data.translation = translation[idx] if len(translation) > idx else ""
+                    if replace_untranslated_with_blank and data.translation == data.original:
+                        data.key = f"BLANK-{idx}"
+                        data.original = data.translation = "\n"
                 result.append(data)
 
             if reference_flag and len(reference) > len(original):
@@ -521,10 +524,10 @@ class Conversion:
         )
 
     def _convert_misc_lotr_legacy_names(self, filepath: Path, type_: FileType) -> list[Data]:
-        return self._convert_misc_plaintext_in_lines(filepath=filepath, type_=type_, ignore_length_unequal=True)
+        return self._convert_misc_plaintext_in_lines(filepath=filepath, type_=type_, ignore_length_unequal=True, replace_untranslated_with_blank=True)
 
     def _convert_misc_lotr_legacy_speech(self, filepath: Path, type_: FileType) -> list[Data]:
-        return self._convert_misc_plaintext_in_lines(filepath=filepath, type_=type_, ignore_length_unequal=True)
+        return self._convert_misc_plaintext_in_lines(filepath=filepath, type_=type_, ignore_length_unequal=True, replace_untranslated_with_blank=True)
 
 
 class Restoration:
