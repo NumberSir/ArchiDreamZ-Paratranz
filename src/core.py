@@ -342,11 +342,13 @@ class Conversion:
             reference: list[str] = kwargs["reference"]
             translation_flag: bool = kwargs["translation_flag"]
             translation: list[str] = kwargs["translation"]
-            
-            if reference_flag and len(original) != len(reference):
+
+            reference_length_unequal = len(original) != len(reference)
+            if reference_flag and reference_length_unequal:
                 logger.bind(filepath=filepath).warning(f"Reference length inequal ({len(original)}/{len(reference)})")
-                reference_flag = ignore_length_unequal
-            if translation_flag and len(original) != len(translation):
+
+            translation_length_unequal = len(original) != len(translation)
+            if translation_flag and translation_length_unequal:
                 logger.bind(filepath=filepath).warning(f"Translation length inequal ({len(original)}/{len(translation)})")
                 translation_flag = ignore_length_unequal
 
@@ -362,26 +364,29 @@ class Conversion:
                     translation=""
                 )
                 if reference_flag:
-                    data.context = reference[idx] if len(reference) > idx else ""
+                    if reference_length_unequal:
+                        data.context = "\n".join(reference)
+                    else:
+                        data.context = reference[idx] if len(reference) > idx else ""
                 if translation_flag:
                     data.translation = translation[idx] if len(translation) > idx else ""
                     if replace_untranslated_with_blank and data.translation == data.original:
                         data.translation = "\n"
                 result.append(data)
 
-            if reference_flag and len(reference) > len(original):
-                for idx_, line_ in enumerate(reference[len(original):]):
-                    newkey = f"{len(original)+idx_}-REFERENCE"
-                    if not line_.strip():
-                        newkey = f"BLANK-{newkey}"
-
-                    data = Data(
-                        key=newkey,
-                        original=line_,
-                        translation="",
-                        context="Additional in reference"
-                    )
-                    result.append(data)
+            # if reference_flag and len(reference) > len(original):
+            #     for idx_, line_ in enumerate(reference[len(original):]):
+            #         newkey = f"{len(original)+idx_}-REFERENCE"
+            #         if not line_.strip():
+            #             newkey = f"BLANK-{newkey}"
+            #
+            #         data = Data(
+            #             key=newkey,
+            #             original=line_,
+            #             translation="",
+            #             context="Additional in reference"
+            #         )
+            #         result.append(data)
 
             if translation_flag and len(translation) > len(original):
                 for idx_, line_ in enumerate(translation[len(original):]):
