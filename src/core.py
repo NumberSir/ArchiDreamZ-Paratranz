@@ -74,7 +74,7 @@ class Conversion:
                         datas = self._convert_json_lang(relative_path, file_type)
                     case _:
                         datas = self._convert_misc(relative_path, file_type)
-                
+
                 if datas is None:
                     logger.bind(filepath=relative_path).warning("Converting file failed")
                     return
@@ -343,18 +343,20 @@ class Conversion:
             translation_flag: bool = kwargs["translation_flag"]
             translation: list[str] = kwargs["translation"]
 
-            reference_length_unequal = len(original) != len(reference)
-            if reference_flag and reference_length_unequal:
+            reference_length_unequal = False
+            if reference_flag and len(original) != len(reference):
+                reference_length_unequal = len(original) != len(reference)
                 logger.bind(filepath=filepath).warning(f"Reference length inequal ({len(original)}/{len(reference)})")
 
-            translation_length_unequal = len(original) != len(translation)
+            translation_length_unequal = False
             if translation_flag and translation_length_unequal:
+                translation_length_unequal = len(original) != len(translation)
                 logger.bind(filepath=filepath).warning(f"Translation length inequal ({len(original)}/{len(translation)})")
                 translation_flag = ignore_length_unequal
 
             result = []
             for idx, line in enumerate(original):
-                key = f"{idx}"
+                key = f"{'-'.join(filepath.parts)}-{idx}"
                 if not line.strip():
                     key = f"BLANK-{key}"
 
@@ -390,7 +392,7 @@ class Conversion:
 
             if translation_flag and len(translation) > len(original):
                 for idx_, line_ in enumerate(translation[len(original):]):
-                    newkey = f"{len(original)+idx_}-TRANSLATION"
+                    newkey = f"{'-'.join(filepath.parts)}-{len(original)+idx_}-TRANSLATION"
                     if not line_.strip():
                         newkey = f"BLANK-{newkey}"
 
