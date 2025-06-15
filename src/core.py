@@ -349,7 +349,7 @@ class Conversion:
                 logger.bind(filepath=filepath).warning(f"Reference length inequal ({len(original)}/{len(reference)})")
 
             translation_length_unequal = False
-            if translation_flag and translation_length_unequal:
+            if translation_flag and len(original) != len(translation):
                 translation_length_unequal = len(original) != len(translation)
                 logger.bind(filepath=filepath).warning(f"Translation length inequal ({len(original)}/{len(translation)})")
                 translation_flag = ignore_length_unequal
