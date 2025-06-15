@@ -334,7 +334,7 @@ class Conversion:
             process_function=_process,
         )
 
-    def _convert_misc_plaintext_in_lines(self, filepath: Path, type_: FileType, *, ignore_length_unequal: bool = False, replace_untranslated_with_blank: bool = False) -> list[Data]:
+    def _convert_misc_plaintext_in_lines(self, filepath: Path, type_: FileType, *, replace_untranslated_with_blank: bool = False) -> list[Data]:
         """plaintext, split in lines"""
         def _process(**kwargs) -> list[Data]:
             original: list[str] = kwargs["original"]
@@ -348,15 +348,13 @@ class Conversion:
                 reference_length_unequal = len(original) != len(reference)
                 logger.bind(filepath=filepath).warning(f"Reference length inequal ({len(original)}/{len(reference)})")
 
-            translation_length_unequal = False
             if translation_flag and len(original) != len(translation):
-                translation_length_unequal = len(original) != len(translation)
                 logger.bind(filepath=filepath).warning(f"Translation length inequal ({len(original)}/{len(translation)})")
-                translation_flag = ignore_length_unequal
+                return None  # https://github.com/NumberSir/ArchiDreamZ-Paratranz/issues/9
 
             result = []
             for idx, line in enumerate(original):
-                key = f"{'-'.join(filepath.parts)}-{idx}"
+                key = f"{'.'.join(filepath.with_suffix('').parts)}.{idx}"
                 if not line.strip():
                     key = f"BLANK-{key}"
 
@@ -390,19 +388,19 @@ class Conversion:
             #         )
             #         result.append(data)
 
-            if translation_flag and len(translation) > len(original):
-                for idx_, line_ in enumerate(translation[len(original):]):
-                    newkey = f"{'-'.join(filepath.parts)}-{len(original)+idx_}-TRANSLATION"
-                    if not line_.strip():
-                        newkey = f"BLANK-{newkey}"
-
-                    data = Data(
-                        key=newkey,
-                        original="EXTRA",
-                        translation=line_,
-                        context="Additional in translation"
-                    )
-                    result.append(data)
+            # if translation_flag and len(translation) > len(original):
+            #     for idx_, line_ in enumerate(translation[len(original):]):
+            #         newkey = f"{'-'.join(filepath.parts)}-{len(original)+idx_}-TRANSLATION"
+            #         if not line_.strip():
+            #             newkey = f"BLANK-{newkey}"
+            #
+            #         data = Data(
+            #             key=newkey,
+            #             original="EXTRA",
+            #             translation=line_,
+            #             context="Additional in translation"
+            #         )
+            #         result.append(data)
             return result
 
         return self._convert_general(
@@ -530,10 +528,10 @@ class Conversion:
         )
 
     def _convert_misc_lotr_legacy_names(self, filepath: Path, type_: FileType) -> list[Data]:
-        return self._convert_misc_plaintext_in_lines(filepath=filepath, type_=type_, ignore_length_unequal=True, replace_untranslated_with_blank=True)
+        return self._convert_misc_plaintext_in_lines(filepath=filepath, type_=type_, replace_untranslated_with_blank=True)
 
     def _convert_misc_lotr_legacy_speech(self, filepath: Path, type_: FileType) -> list[Data]:
-        return self._convert_misc_plaintext_in_lines(filepath=filepath, type_=type_, ignore_length_unequal=True, replace_untranslated_with_blank=True)
+        return self._convert_misc_plaintext_in_lines(filepath=filepath, type_=type_, replace_untranslated_with_blank=True)
 
 
 class Restoration:
