@@ -77,7 +77,7 @@ class Conversion:
 
                 if datas is None:
                     logger.bind(filepath=relative_path).warning("Converting file failed")
-                    return
+                    continue
 
                 with open(settings.filepath.root / settings.filepath.converted / converted_path, "w", encoding="utf-8") as fp:
                     json.dump([asdict(_) for _ in datas], fp, ensure_ascii=False, indent=2)
