@@ -20,6 +20,7 @@ from src.log import logger
 DIR_ORIGINAL = settings.filepath.root / settings.filepath.source / "original"
 DIR_REFERENCE = settings.filepath.root / settings.filepath.source / "reference"
 DIR_TRANSLATION = settings.filepath.root / settings.filepath.source / "translation"
+DIR_TRANSLATION_EXTRA = settings.filepath.root / settings.filepath.source / "translation_extra"
 
 FileContent = str | list[str] | list | dict
 
@@ -113,6 +114,15 @@ class Conversion:
             if not translation:
                 translation_flag = False
 
+        translation_extra = None
+        filename_translation_extra: str | None = kwargs.get("filename_translation_extra", None)
+        filepath_translation_extra = (DIR_TRANSLATION_EXTRA / filepath.parent / filename_translation_extra) if filename_translation_extra else (DIR_TRANSLATION_EXTRA / filepath)
+        if translation_extra_flag := filepath_translation_extra.exists():
+            logger.bind(filepath=filepath_translation_extra.relative_to(DIR_TRANSLATION_EXTRA)).debug("Translation extra file exists")
+            translation_extra = Project.safe_read(filepath_translation_extra, type_)
+            if not translation_extra:
+                translation_extra_flag = False
+
         return process_function(
             filepath=filepath,
             original=original,
@@ -120,6 +130,8 @@ class Conversion:
             reference_flag=reference_flag,
             translation=translation,
             translation_flag=translation_flag,
+            translation_extra=translation_extra,
+            translation_extra_flag=translation_extra_flag,
             **kwargs
         )
 
@@ -342,6 +354,8 @@ class Conversion:
             reference: list[str] = kwargs["reference"]
             translation_flag: bool = kwargs["translation_flag"]
             translation: list[str] = kwargs["translation"]
+            translation_extra_flag: bool = kwargs["translation_extra_flag"]
+            translation_extra: list[str] = kwargs["translation_extra"]
 
             reference_length_unequal = False
             if reference_flag and len(original) != len(reference):
@@ -375,33 +389,20 @@ class Conversion:
                         data.translation = "\n"
                 result.append(data)
 
-            # if reference_flag and len(reference) > len(original):
-            #     for idx_, line_ in enumerate(reference[len(original):]):
-            #         newkey = f"{len(original)+idx_}-REFERENCE"
-            #         if not line_.strip():
-            #             newkey = f"BLANK-{newkey}"
-            #
-            #         data = Data(
-            #             key=newkey,
-            #             original=line_,
-            #             translation="",
-            #             context="Additional in reference"
-            #         )
-            #         result.append(data)
+            if translation_extra_flag:
+                for idx, line in enumerate(translation_extra):
+                    key = f"{'.'.join(filepath.with_suffix('').parts)}.{idx+len(original)+1}"
+                    if not line.strip():
+                        key = f"BLANK-{key}"
 
-            # if translation_flag and len(translation) > len(original):
-            #     for idx_, line_ in enumerate(translation[len(original):]):
-            #         newkey = f"{'-'.join(filepath.parts)}-{len(original)+idx_}-TRANSLATION"
-            #         if not line_.strip():
-            #             newkey = f"BLANK-{newkey}"
-            #
-            #         data = Data(
-            #             key=newkey,
-            #             original="EXTRA",
-            #             translation=line_,
-            #             context="Additional in translation"
-            #         )
-            #         result.append(data)
+                    result.append(
+                        Data(
+                            key=key,
+                            original="Extra keys in translation",
+                            translation=line
+                        )
+                    )
+
             return result
 
         return self._convert_general(
@@ -582,10 +583,15 @@ class Restoration:
         with open(filepath_download, "r", encoding="utf-8") as fp:
             download = json.load(fp)
 
+        filepath_translation_extra = DIR_TRANSLATION_EXTRA / filepath
+        translation_extra_flag = filepath_translation_extra.exists()
+
         result = process_function(
             filepath=filepath,
             original=original,
             download=download,
+            translation_extra_flag=translation_extra_flag,
+            filepath_translation_extra=filepath_translation_extra,
             **kwargs
         )
 
@@ -665,7 +671,20 @@ class Restoration:
 
     def _restore_misc_plaintext_in_lines(self, filepath: Path, type_: FileType):
         def _process(**kwargs) -> "FileContent":
+            original: list[str] = kwargs["original"]
             download: list[dict] = kwargs["download"]
+            translation_extra_flag: bool = kwargs["translation_extra_flag"]
+            filepath_translation_extra: Path = kwargs["filepath_translation_extra"]
+
+            if translation_extra_flag:
+                download = download[:len(original)]
+                extra = download[len(original):]
+                extra = [
+                    '\n' if line['key'].startswith("BLANK") else line["translation"]
+                    for line in extra
+                ]
+                with open(filepath_translation_extra, "w", encoding="utf-8") as fp:
+                    fp.writelines(extra)
 
             result = []
             for line in download:
