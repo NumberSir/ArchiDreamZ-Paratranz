@@ -77,7 +77,7 @@ class Conversion:
                         datas = self._convert_misc(relative_path, file_type)
 
                 if datas is None:
-                    logger.bind(filepath=relative_path).warning("Converting file failed")
+                    logger.bind(filepath=relative_path).error("Converting file failed")
                     continue
 
                 with open(settings.filepath.root / settings.filepath.converted / converted_path, "w", encoding="utf-8") as fp:
@@ -383,7 +383,7 @@ class Conversion:
                         data.context = "\n".join(reference)
                     else:
                         data.context = reference[idx] if len(reference) > idx else ""
-                if translation_flag:
+                if translation_flag and not translation_length_unequal:
                     data.translation = translation[idx] if len(translation) > idx else ""
                     if replace_untranslated_with_blank and data.translation == data.original:
                         data.translation = "\n"
