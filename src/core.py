@@ -348,9 +348,10 @@ class Conversion:
                 reference_length_unequal = len(original) != len(reference)
                 logger.bind(filepath=filepath).warning(f"Reference length inequal ({len(original)}/{len(reference)})")
 
+            translation_length_unequal = False
             if translation_flag and len(original) != len(translation):
+                translation_length_unequal = len(original) != len(translation)
                 logger.bind(filepath=filepath).warning(f"Translation length inequal ({len(original)}/{len(translation)})")
-                return None  # https://github.com/NumberSir/ArchiDreamZ-Paratranz/issues/9
 
             result = []
             for idx, line in enumerate(original):
@@ -507,10 +508,10 @@ class Conversion:
 
     def _convert_misc_lotr_renewed_speech(self, filepath: Path, type_: FileType) -> list[Data]:
         def _process(**kwargs) -> list[Data]:
-            original: list[dict] = kwargs["original"]
+            original: dict = kwargs["original"]
 
             result = []
-            for idx, speech in enumerate(original):
+            for idx, speech in enumerate(original["speech"]):
                 result.extend([
                     Data(
                         key=f'{idx}-{idx_}',
@@ -753,17 +754,17 @@ class Restoration:
 
     def _restore_misc_lotr_renewed_speech(self, filepath: Path, type_: FileType):
         def _process(**kwargs) -> "FileContent":
-            original: list[dict] = kwargs["original"]
+            original: dict = kwargs["original"]
             download: list[dict] = kwargs["download"]
 
-            for idx, speech in enumerate(original):
+            for idx, speech in enumerate(original["speech"]):
                 for idx_, line in enumerate(speech["lines"]):
                     if result := [
                         _["translation"] or _["original"]
                         for _ in download
                         if _["key"] == f"{idx}-{idx_}"
                     ]:
-                        original[idx]["lines"][idx_] = result[0]
+                        original["speech"][idx]["lines"][idx_] = result[0]
             return original
 
         return self._restore_general(
