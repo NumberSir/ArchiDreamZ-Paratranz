@@ -381,13 +381,13 @@ class Conversion:
                 )
                 if reference_flag:
                     if reference_length_unequal:
-                        data.context = "\n".join(reference)
+                        data.context = "".join(reference)
                     else:
                         data.context = reference[idx].strip() if len(reference) > idx else ""
                 if translation_flag and not translation_length_unequal:
                     data.translation = translation[idx].strip() if len(translation) > idx else ""
                     if replace_untranslated_with_blank and data.translation == data.original:
-                        data.translation = "\n"
+                        data.translation = ""
                 result.append(data)
 
             if translation_extra_flag:
