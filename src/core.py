@@ -168,7 +168,7 @@ class Conversion:
 
                 if reference_flag:
                     potential_context = [
-                        f"{data.context}\n{line_.split('=', 1)[1]}"
+                        f"{data.context}\n{line_.split('=', 1)[1].strip()}"
                         for line_ in reference
                         if line_.startswith(f"{key}=")
                     ]
@@ -196,7 +196,7 @@ class Conversion:
 
                     data = Data(
                         key=newkey,
-                        original=newvalue,
+                        original=newvalue.strip(),
                         translation="",
                         context="Additional in reference"
                     )
@@ -204,7 +204,7 @@ class Conversion:
                     if translation_flag:
                         for line_r in translation:
                             if line_r.startswith(f"{newkey}="):
-                                data.translation = line_r.split("=", 1)[1]
+                                data.translation = line_r.split("=", 1)[1].strip()
                                 break
                     result.append(data)
 
@@ -221,14 +221,14 @@ class Conversion:
                     data = Data(
                         key=newkey,
                         original="MISSING",
-                        translation=newvalue,
+                        translation=newvalue.strip(),
                         context="Additional in translation"
                     )
 
                     if reference_flag:
                         for line_r in reference:
                             if line_r.startswith(f"{newkey}="):
-                                data.context = f"{data.context}\n{line_r.split('=', 1)[1]}"
+                                data.context = f"{data.context}\n{line_r.split('=', 1)[1].strip()}"
                                 break
                     result.append(data)
 
@@ -369,8 +369,9 @@ class Conversion:
 
             result = []
             for idx, line in enumerate(original):
+                line = line.strip()
                 key = f"{'.'.join(filepath.with_suffix('').parts)}.{idx}"
-                if not line.strip():
+                if not line:
                     key = f"BLANK-{key}"
 
                 data = Data(
@@ -382,15 +383,16 @@ class Conversion:
                     if reference_length_unequal:
                         data.context = "\n".join(reference)
                     else:
-                        data.context = reference[idx] if len(reference) > idx else ""
+                        data.context = reference[idx].strip() if len(reference) > idx else ""
                 if translation_flag and not translation_length_unequal:
-                    data.translation = translation[idx] if len(translation) > idx else ""
+                    data.translation = translation[idx].strip() if len(translation) > idx else ""
                     if replace_untranslated_with_blank and data.translation == data.original:
                         data.translation = "\n"
                 result.append(data)
 
             if translation_extra_flag:
                 for idx, line in enumerate(translation_extra):
+                    line = line.strip()
                     key = f"{'.'.join(filepath.with_suffix('').parts)}.{idx+len(original)+1}"
                     if not line.strip():
                         key = f"BLANK-{key}"
