@@ -687,6 +687,10 @@ class Restoration:
                 ]
                 with open(filepath_translation_extra, "w", encoding="utf-8") as fp:
                     fp.writelines(extra)
+                shutil.copyfile(
+                    filepath_translation_extra,
+                    settings.filepath.root / settings.filepath.result / "extra" / filepath_translation_extra.relative_to(DIR_TRANSLATION_EXTRA)
+                )
 
             result = []
             for line in download:
