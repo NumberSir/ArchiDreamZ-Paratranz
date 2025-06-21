@@ -337,7 +337,7 @@ class Conversion:
             if reference_flag:
                 data.context = reference
             if translation_flag:
-                data.translation = translation
+                data.translation = translation if translation != original else ""
             return [data]
 
         return self._convert_general(
