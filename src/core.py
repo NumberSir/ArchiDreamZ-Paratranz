@@ -386,7 +386,7 @@ class Conversion:
                         data.context = reference[idx].strip() if len(reference) > idx else ""
                 if translation_flag and not translation_length_unequal:
                     data.translation = translation[idx].strip() if len(translation) > idx else ""
-                    if replace_untranslated_with_blank and data.translation == data.original:
+                    if replace_untranslated_with_blank and (data.translation == data.original or translation.strip() == reference.strip()):
                         data.translation = ""
                 result.append(data)
 
