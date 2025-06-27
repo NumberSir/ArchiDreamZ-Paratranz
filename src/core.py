@@ -517,7 +517,7 @@ class Conversion:
             for idx, speech in enumerate(original["speech"]):
                 result.extend([
                     Data(
-                        key=f'{idx}-{idx_}',
+                        key=f"{'.'.join(filepath.with_suffix('').parts)}.{idx}.{idx_}",
                         original=line,
                         translation="",
                     )
