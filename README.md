@@ -1,11 +1,24 @@
 # 简介
 半自动化汉化 Minecraft 模组小工具
 
-# 用法
-1. 安装 Python 3.8+, 安装必需的库：
-```shell
-pip install -r requirements.txt
-```
+
+# 使用前
+1. 你的电脑上需要有 [Python][Python] 3.10 环境
+
+# 使用说明
+1. 安装本项目必需的库：
+    - 安装 [pipx](https://pipx.pypa.io/stable/installation/)
+    ```shell
+    pip install pipx
+    ```
+    - 安装 [poetry](https://python-poetry.org/docs/#installation)
+    ```shell
+    pipx install poetry
+    ```
+    - 使用 poetry 安装项目依赖
+    ```shell
+    poetry install
+    ```
 2. 在 `./resource/1-SourceFile` 文件夹下按照模组放入需要汉化的原文件
     - 其中 `original` 文件夹中放原文件
     - 若有其他语言参考请按照同样相对路径放入 `reference` 文件夹中
