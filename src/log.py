@@ -11,6 +11,13 @@ DIR_LOGS = settings.filepath.root / settings.filepath.data / "logs"
 os.makedirs(DIR_LOGS, exist_ok=True)
 
 
+def add_project_name(record):
+    if record["extra"].get("project_name", False):
+        record["extra"]["project_name"] = f"[{record['extra']['project_name']}] | "
+    else:
+        record["extra"]["project_name"] = ""
+
+
 def add_filepath(record):
     if record["extra"].get("filepath", False):
         record["extra"]["filepath"] = f" | {record['extra']['filepath']}"
@@ -18,6 +25,7 @@ def add_filepath(record):
         record["extra"]["filepath"] = ""
 
 logger_.remove()
+logger_ = logger_.patch(add_project_name)
 logger_ = logger_.patch(add_filepath)
 logger_.add(sink=sys.stdout, format=settings.project.log_format, colorize=True, level=settings.project.log_level)
 logger_.add(sink=DIR_LOGS / f'{datetime.datetime.now().strftime("%Y%m%d-%H%M%S")}.log', format=settings.project.log_format, colorize=False, level="INFO", encoding='utf-8')
