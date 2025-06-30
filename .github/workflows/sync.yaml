@@ -35,6 +35,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install aiohttp
+          pip install aiohttp-retry
+          pip install --no-dependencies git+https://github.com/MuXiu1997/ParaTranz-SDK-python.git
 
       - name: Sync
         run: |

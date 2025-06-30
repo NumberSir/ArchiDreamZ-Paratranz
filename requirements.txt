@@ -1,10 +1,9 @@
 pydantic~=2.11.4
 typing_extensions~=4.13.2
-urllib3~=2.4.0
 python-dateutil~=2.9.0.post0
 loguru~=0.7.3
 httpx~=0.28.1
 python-dotenv~=1.1.0
 pydantic-settings~=2.9.1
 chardet~=5.2.0
-paratranz @ git+https://github.com/MuXiu1997/ParaTranz-SDK-python.git@98c96bc9dd8bd0379eae72c64b24587f41696a83
+
