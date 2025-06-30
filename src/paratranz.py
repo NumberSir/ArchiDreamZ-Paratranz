@@ -11,7 +11,7 @@ from src.log import logger
 
 
 class Paratranz:
-    def __init__(self, client: httpx.Client):
+    def __init__(self, client: httpx.Client = httpx.Client()):
         logger.info("")
         logger.info("======= PARATRANZ START =======")
         self._client = client
@@ -19,53 +19,36 @@ class Paratranz:
         self._headers = {"Authorization": settings.paratranz.token}
         self._project_id = settings.paratranz.project_id
 
-        # self._paratranz_client = ParatranzClient(
-        #     Configuration(
-        #         host=self.base_url,
-        #         api_key={"Token": settings.paratranz.token},
-        #     )
-        # )
+    def get_files(self) -> list:
+        url = f"{self.base_url}/projects/{self.project_id}/files"
+        response = self.client.get(url, headers=self.headers)
+        return response.json()
 
-    # def upload(self):
-    #     logger.info("Starting uploading files from Paratranz...")
-    #     files = self._get_files()
-    # 
-    #     filepaths = [Path(_["name"]) for _ in files]
-    #     fileids = [_["id"] for _ in files]
-    #     filepairs = dict(zip(filepaths, fileids))
-    # 
-    #     for root, dirs, files in os.walk(settings.filepath.root / settings.filepath.converted):
-    #         for file in files:
-    #             filepath = Path(root) / file
-    #             relative_path = filepath.relative_to(settings.filepath.root / settings.filepath.converted)
-    # 
-    #             with open(filepath, "r") as fp:
-    #                 file_data = fp.read()
-    # 
-    #             if relative_path in filepaths:  # update
-    #                 logger.info(f"Updating file: {relative_path}")
-    #                 self._update_file(file=file_data, fileid=filepairs[relative_path])
-    #             else:                           # create
-    #                 logger.info(f"Creating file: {relative_path}")
-    #                 self._create_file(file=file_data, path=relative_path)
-    #     logger.info("Upload completes.")
+    def update_file(self, file: Path | str, fileid: int):
+        """
+        :param file: 文件在本地的路径
+        :param fileid: 唯一标识符
+        """
+        file = file.__str__() if isinstance(file, Path) else file
 
-    # def _get_files(self) -> list[dict]:
-    #     response = FilesApi(self.paratranz_client).get_files(self.project_id)
-    #     return response
-
-    def _update_file(self, file: str, fileid: int):
         url = f"{self.base_url}/projects/{self.project_id}/files/{fileid}"
         headers = {**self.headers, 'Content-Type': 'multipart/form-data'}
-        data = {"file": bytearray(file, "utf-8")}
+        data = {"file": file}
         response = self.client.post(url, headers=headers, data=data)
         logger.bind(filepath=response.json()).success("Updated file successfully")
 
-    def _create_file(self, file: str, path: Path):
+    def create_file(self, file: Path, path: Path | str):
+        """
+        :param file: 文件在本地的路径
+        :param path: 文件在平台上的路径
+        """
+        path = path.__str__() if isinstance(path, Path) else path
+
         url = f"{self.base_url}/projects/{self.project_id}/files"
         headers = {**self.headers, 'Content-Type': 'multipart/form-data'}
-        data = {"file": bytearray(file, "utf-8"), "path": path.__str__()}
-        response = self.client.post(url, headers=headers, data=data)
+        data = {"path": path}
+        files = {file.name: open(file, "rb")}
+        response = self.client.post(url, headers=headers, files=files, data=data)
         logger.bind(filepath=response.json()).success("Created file successfully")
 
     def download(self):
