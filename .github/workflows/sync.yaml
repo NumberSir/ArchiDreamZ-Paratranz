@@ -23,10 +23,6 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Get current time
-        id: time
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
-
       - name: Checkout
         uses: actions/checkout@v4
 
