@@ -2,7 +2,7 @@ name: Sync LoTRWiki with Paratranz Project
 
 on:
   schedule:
-    - cron: "0 0 0 1 * ?"  # 1st day every month
+    - cron: "0 0 1 * *"  # 1st day every month
   workflow_dispatch:
 
 env:
