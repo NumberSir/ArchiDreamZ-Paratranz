@@ -11,9 +11,9 @@ class ProjectSettings(BaseSettings):
     """About this project"""
     model_config = SettingsConfigDict(env_prefix="PROJECT_")
 
-    name: str = Field(default="SugarCube2-Localization")
+    name: str = Field(default="ArchiDreamZ-Paratranz")
     log_level: str = Field(default="INFO")
-    log_format: str = Field(default="<g>{time:HH:mm:ss}</g> | [<lvl>{level:^7}</lvl>] | {message:<35}{extra[filepath]}")
+    log_format: str = Field(default="<g>{time:HH:mm:ss}</g> | [<lvl>{level:^7}</lvl>] | {extra[project_name]}{message:<35}{extra[filepath]}")
     language: str = Field(default="zh_cn")
 
 
@@ -36,23 +36,34 @@ class GitHubSettings(BaseSettings):
     """About GitHub"""
     model_config = SettingsConfigDict(env_prefix='GITHUB_')
 
-    access_token: str = Field(default=None)
+    access_token: str = Field(default="")
 
 
 class ParatranzSettings(BaseSettings):
     """About Paratranz"""
     model_config = SettingsConfigDict(env_prefix='PARATRANZ_')
 
-    project_id: int = Field(default=None)
-    token: str = Field(default=None)
+    project_id: int = Field(default="")
+    token: str = Field(default="")
+
+
+class HuijiWikiSettings(BaseSettings):
+    """About HuijiWiki"""
+    model_config = SettingsConfigDict(env_prefix='HUIJI_')
+
+    username: str = Field(default="")
+    userid: str = Field(default="")
+    token: str = Field(default="")
 
 
 class Settings(BaseSettings):
     """Main settings"""
-    paratranz: ParatranzSettings = ParatranzSettings()
     github: GitHubSettings = GitHubSettings()
     project: ProjectSettings = ProjectSettings()
     filepath: FilepathSettings = FilepathSettings()
+
+    huijiwiki: HuijiWikiSettings = HuijiWikiSettings()
+    paratranz: ParatranzSettings = ParatranzSettings()
 
 
 settings = Settings()
