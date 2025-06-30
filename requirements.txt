@@ -1,9 +1,8 @@
-pydantic~=2.11.4
-typing_extensions~=4.13.2
-python-dateutil~=2.9.0.post0
 loguru~=0.7.3
-httpx~=0.28.1
-python-dotenv~=1.1.0
-pydantic-settings~=2.9.1
 chardet~=5.2.0
-
+python-dotenv~=1.1.0
+pydantic~=2.11.4
+pydantic-settings~=2.9.1
+paratranz~=3.0.4
+selenium~=4.34.0
+httpx~=0.28.1
