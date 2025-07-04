@@ -330,7 +330,7 @@ class Conversion:
             translation: str = kwargs["translation"]
 
             data = Data(
-                key=f"{filepath.with_suffix('').name}",
+                key=f"{'.'.join(filepath.with_suffix('').parts)}",
                 original=original,
                 translation=""
             )
@@ -441,8 +441,8 @@ class Conversion:
             dialog_text = re.findall(r'\"DialogText\": \"([\s\S]*?)\",*\n', original)
 
             fetch = {
-                "dialogtext": dialog_text[0] if dialog_text else "",
-                **dict(zip(option_slots, option_titles)),
+                "DialogText": dialog_text[0] if dialog_text else "",
+                **dict(zip([f"OptionSlot.{idx}" for idx in option_slots], option_titles)),
             }
 
             if translation_flag:
@@ -451,14 +451,14 @@ class Conversion:
                 dialog_text_translation = re.findall(r'\"DialogText\": \"([\s\S]*?)\",*\n', translation)
 
                 fetch_translation = {
-                    "dialogtext": dialog_text_translation[0] if dialog_text_translation else "",
-                    **dict(zip(option_slots_translation, option_titles_translation)),
+                    "DialogText": dialog_text_translation[0] if dialog_text_translation else "",
+                    **dict(zip([f"OptionSlot.{idx}" for idx in option_slots_translation], option_titles_translation)),
                 }
 
             result = []
             for key, value in fetch.items():
                 data = Data(
-                    key=key,
+                    key=f"{'.'.join(filepath.with_suffix('').parts)}.{key}",
                     original=value,
                     translation="",
                 )
@@ -480,21 +480,21 @@ class Conversion:
             translation: str = kwargs["translation"]
 
             fetch = {
-                "text": re.findall(r'\"Text\": \"([\s\S]*?)\",*\n', original)[0],
-                "completetext": re.findall(r'\"CompleteText\": \"([\s\S]*?)\",*\n', original)[0],
+                "Text": re.findall(r'\"Text\": \"([\s\S]*?)\",*\n', original)[0],
+                "CompleteText": re.findall(r'\"CompleteText\": \"([\s\S]*?)\",*\n', original)[0],
             }
 
             if translation_flag:
                 fetch_translation = {
-                    "title": re.findall(r'\"Title\": \"([\s\S]*?)\",*\n', translation)[0],
-                    "text": re.findall(r'\"Text\": \"([\s\S]*?)\",*\n', translation)[0],
-                    "completetext": re.findall(r'\"CompleteText\": \"([\s\S]*?)\",*\n', translation)[0],
+                    "Title": re.findall(r'\"Title\": \"([\s\S]*?)\",*\n', translation)[0],
+                    "Text": re.findall(r'\"Text\": \"([\s\S]*?)\",*\n', translation)[0],
+                    "CompleteText": re.findall(r'\"CompleteText\": \"([\s\S]*?)\",*\n', translation)[0],
                 }
 
             result = []
             for key, value in fetch.items():
                 data = Data(
-                    key=key,
+                    key=f"{'.'.join(filepath.with_suffix('').parts)}.{key}",
                     original=value,
                     translation="",
                 )
