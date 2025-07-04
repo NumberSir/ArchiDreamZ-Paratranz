@@ -23,6 +23,7 @@
     - 其中 `original` 文件夹中放原文件
     - 若有其他语言参考请按照同样相对路径放入 `reference` 文件夹中
     - 若有已经翻译好的文件请按照同样相对路径放入 `translation` 文件夹中
+    - 若魔戒模组的 names 与 speech 文件中有译者自创的额外姓名或对话，请将额外内容剪切到同名的新文件内，并将新文件按照同样相对路径放入 `translation_extra` 文件夹中
 ```text
 resource
 ┖━ 1-SourceFile
@@ -40,9 +41,20 @@ resource
    ┃  ┃  ┃  ┗━ en_US.lang
    ┃  ┃  ┗━ ...
    ┃  ┗━ ...
-   ┗━ translation
-      ┣━ CustomNPCs
-      ┃  ┗━ ...
+   ┣━ translation
+   ┃  ┣━ CustomNPCs
+   ┃  ┃  ┗━ ...
+   ┃  ┣━ LOTRReworked
+   ┃  ┃  ┣━ lang
+   ┃  ┃  ┃  ┗━ zh_CN.lang
+   ┃  ┃  ┗━ ...
+   ┃  ┗━ ...
+   ┗━ translation_extra
+      ┣━ LOTRReworked
+      ┃  ┣━ names
+      ┃  ┃  ┗━ ...
+      ┃  ┗━ speech
+      ┃     ┗━ ...
       ┗━ ...
 ```
 3. 填写 `.env` 中的环境变量
