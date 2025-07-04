@@ -68,7 +68,7 @@ PARATRANZ_TOKEN=<必填。Paratranz 个人 token，32 位字母数字组合>
 ```
 4. 运行根目录下的 `main.py`
 ```shell
-python -m main
+poetry run python -m main
 ```
 5. `./resource/2-ConvertedParatranzFile` 中会生成处理后的原文件，需要手动上传到 Paratranz 项目根目录下
 6. `./resource/3-TranslatedParatranzFile` 中会生成自动下载好的原文-汉化字典，若没有说明你的 Paratranz 项目中没有汉化文件，或 Paratranz 项目结构不对
