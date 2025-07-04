@@ -442,7 +442,7 @@ class Conversion:
 
             fetch = {
                 "DialogText": dialog_text[0] if dialog_text else "",
-                **dict(zip([f"OptionSlot.{idx}" for idx in option_slots], option_titles)),
+                **dict(zip([f"Options.slot{idx}" for idx in option_slots], option_titles)),
             }
 
             if translation_flag:
@@ -452,13 +452,13 @@ class Conversion:
 
                 fetch_translation = {
                     "DialogText": dialog_text_translation[0] if dialog_text_translation else "",
-                    **dict(zip([f"OptionSlot.{idx}" for idx in option_slots_translation], option_titles_translation)),
+                    **dict(zip([f"Options.slot{idx}" for idx in option_slots_translation], option_titles_translation)),
                 }
 
             result = []
             for key, value in fetch.items():
                 data = Data(
-                    key=f"{'.'.join(filepath.with_suffix('').parts)}.{key}",
+                    key=f"{'.'.join(filepath.with_suffix('').parts[:-1])}.file{filepath.with_suffix('').name}.{key}",
                     original=value,
                     translation="",
                 )
@@ -494,7 +494,7 @@ class Conversion:
             result = []
             for key, value in fetch.items():
                 data = Data(
-                    key=f"{'.'.join(filepath.with_suffix('').parts)}.{key}",
+                    key=f"{'.'.join(filepath.with_suffix('').parts[:-1])}.file{filepath.with_suffix('').name}.{key}",
                     original=value,
                     translation="",
                 )
