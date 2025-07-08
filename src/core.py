@@ -438,7 +438,7 @@ class Conversion:
 
             option_slots = re.findall(r'\"OptionSlot\": (\d+),*\n', original)
             option_titles = re.findall(r'\"Title\": \"([\s\S]*?)\",*\n', original)
-            dialog_text = re.findall(r'\"DialogText\": \"([\s\S]*?)\",*\n', original)
+            dialog_text = re.findall(r'\"DialogText\": \"([\s\S]*?)(?<!\\)\",\n', original) or re.findall(r'\"DialogText\": \"([\s\S]*?)(?<!\\)\"\n', original)
 
             fetch = {
                 "DialogText": dialog_text[0] if dialog_text else "",
@@ -448,7 +448,7 @@ class Conversion:
             if translation_flag:
                 option_slots_translation = re.findall(r'\"OptionSlot\": (\d+),*\n', translation)
                 option_titles_translation = re.findall(r'\"Title\": \"([\s\S]*?)\",*\n', translation)
-                dialog_text_translation = re.findall(r'\"DialogText\": \"([\s\S]*?)\",*\n', translation)
+                dialog_text_translation = re.findall(r'\"DialogText\": \"([\s\S]*?)\",*\n', translation) or re.findall(r'\"DialogText\": \"([\s\S]*?)(?<!\\)\"\n', translation)
 
                 fetch_translation = {
                     "DialogText": dialog_text_translation[0] if dialog_text_translation else "",
