@@ -180,7 +180,7 @@ class Conversion:
                         for line_ in translation
                         if line_.startswith(f"{key}=")
                     ]
-                    data.translation = potential_translation[0] if potential_translation else data.translation
+                    data.translation = potential_translation[0] if potential_translation and potential_translation[0] != value else data.translation
 
                 result.append(data)
 
@@ -262,6 +262,7 @@ class Conversion:
                     data.context = reference.get(key, "Not exist in reference")
                 if translation_flag:
                     data.translation = translation.get(key, "")
+                    data.translation = data.translation if data.translation != value else ""
                 result.append(data)
 
             # some keys not exist in original but do exist in reference
