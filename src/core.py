@@ -734,12 +734,13 @@ class Restoration:
             option_slots = re.findall(r'\"OptionSlot\": (\d+),*\n', original)
             option_titles = list(re.finditer(r'\"Title\": \"([\s\S]*?)\",*\n', original))
             for slot, title in list(zip(option_slots, option_titles))[::-1]:
+                key = f"{'.'.join(filepath.with_suffix('').with_suffix('').parts[:-1])}.file{filepath.with_suffix('').with_suffix('').name}.Options.slot{slot}"
                 processed_line = title.group().replace(
                     title.groups()[0],
                     [
                         _['translation'] or _['original']
                         for _ in download
-                        if _['key'] == slot
+                        if _['key'] == key
                     ][0]
                 )
 
@@ -785,10 +786,11 @@ class Restoration:
 
             for idx, speech in enumerate(original["speech"]):
                 for idx_, line in enumerate(speech["lines"]):
+                    key = f"{'.'.join(filepath.with_suffix('').with_suffix('').parts)}.speech{idx}.line{idx_}"
                     if result := [
                         _["translation"] or _["original"]
                         for _ in download
-                        if _["key"] == f"{idx}-{idx_}"
+                        if _["key"] == key
                     ]:
                         original["speech"][idx]["lines"][idx_] = result[0]
             return original
