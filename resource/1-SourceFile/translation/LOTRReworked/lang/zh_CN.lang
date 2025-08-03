@@ -1,0 +1,13 @@
+
+lotr.menu.title=魔戒 Mod[锟斤拷与彼梦汉化]: 为 Minecraft 带来新的中洲！
+
+lotr.config.dimension=ID измерений
+lotr.config.gameplay=Игровой процесс
+lotr.config.gui=显示与界面
+lotr.config.environment=环境与世界
+lotr.config.misc=Miscellaneous
+
+generator.middleEarth=中洲
+generator.middleEarth.info=Spawn directly into Middle-earth
+generator.meClassic=中洲经典
+generator.meClassic.info=

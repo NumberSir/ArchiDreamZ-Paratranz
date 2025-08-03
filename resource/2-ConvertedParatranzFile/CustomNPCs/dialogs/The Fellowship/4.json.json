@@ -1,0 +1,20 @@
+[
+  {
+    "key": "CustomNPCs.dialogs.The Fellowship.file4.DialogText",
+    "original": "A wizard is never late, @p . Nor is he early. He arrives precisely when he means to!\n\nOur meeting here in Bag End is no coincidence.\nWe have something important to talk about!\n\n",
+    "translation": "巫师从不迟到，@p，也不会早到，只会按他的意思准时抵达！\n\n我们在袋底洞的会面并非巧合。\n我们有重要的事情要谈！\n\n",
+    "context": ""
+  },
+  {
+    "key": "CustomNPCs.dialogs.The Fellowship.file4.Options.slot0",
+    "original": "Hello Gandalf, nice to see you! What happened? You look worried.",
+    "translation": "嗨，甘道夫，很高兴见到你！发生了什么事？你看起来忧心忡忡。",
+    "context": ""
+  },
+  {
+    "key": "CustomNPCs.dialogs.The Fellowship.file4.Options.slot1",
+    "original": "Goodbye! ",
+    "translation": "再会！ ",
+    "context": ""
+  }
+]

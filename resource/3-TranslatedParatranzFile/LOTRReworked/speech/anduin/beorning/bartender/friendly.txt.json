@@ -1,0 +1,44 @@
+[
+  {
+    "key": "LOTRReworked.speech.anduin.beorning.bartender.friendly.0",
+    "original": "Приветствую, #!",
+    "translation": "你好, #！",
+    "context": "Greetings, #!"
+  },
+  {
+    "key": "LOTRReworked.speech.anduin.beorning.bartender.friendly.1",
+    "original": "Добро пожаловать, #! Чем могу услужить?",
+    "translation": "欢迎, #! 我该如何服务?",
+    "context": "Welcome, #! How can I serve?"
+  },
+  {
+    "key": "LOTRReworked.speech.anduin.beorning.bartender.friendly.2",
+    "original": "Добро пожаловать!",
+    "translation": "欢迎！",
+    "context": "Welcome!"
+  },
+  {
+    "key": "LOTRReworked.speech.anduin.beorning.bartender.friendly.3",
+    "original": "Это лучшая таверна во всём Рованионе!",
+    "translation": "这里是整个罗瓦尼安最好的酒馆！",
+    "context": "This is the best tavern in all of Rhovanion!"
+  },
+  {
+    "key": "LOTRReworked.speech.anduin.beorning.bartender.friendly.4",
+    "original": "Здесь вы найдете самую лучшую еду и напитки!",
+    "translation": "在这里你会找到最好的食物和饮料！",
+    "context": "Here you will find the very best food and drink!"
+  },
+  {
+    "key": "LOTRReworked.speech.anduin.beorning.bartender.friendly.6",
+    "original": "Extra keys in translation",
+    "translation": "我是译者自创的第一句对话",
+    "context": ""
+  },
+  {
+    "key": "LOTRReworked.speech.anduin.beorning.bartender.friendly.7",
+    "original": "Extra keys in translation",
+    "translation": "我是译者自创的第二句对话",
+    "context": ""
+  }
+]

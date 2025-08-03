@@ -1,0 +1,74 @@
+[
+  {
+    "key": "BLANK-0",
+    "original": "",
+    "translation": "",
+    "context": "0"
+  },
+  {
+    "key": "lotr.menu.title",
+    "original": "The Lord of the Rings Mod: Средиземье в Minecraft",
+    "translation": "魔戒 Mod[锟斤拷与彼梦汉化]: 为 Minecraft 带来新的中洲！",
+    "context": "1\nThe Lord of the Rings Mod: Bringing Middle-earth to Minecraft"
+  },
+  {
+    "key": "BLANK-2",
+    "original": "",
+    "translation": "",
+    "context": "2"
+  },
+  {
+    "key": "lotr.config.dimension",
+    "original": "ID измерений",
+    "translation": "群系ID",
+    "context": "3\nDimension IDs"
+  },
+  {
+    "key": "lotr.config.gameplay",
+    "original": "Игровой процесс",
+    "translation": "游戏玩法",
+    "context": "4\nGameplay"
+  },
+  {
+    "key": "lotr.config.gui",
+    "original": "Интерфейс",
+    "translation": "显示与界面",
+    "context": "5\nDisplay & GUI"
+  },
+  {
+    "key": "lotr.config.environment",
+    "original": "Настройки мира",
+    "translation": "环境与世界",
+    "context": "6\nEnvironment & World"
+  },
+  {
+    "key": "lotr.config.misc",
+    "original": "Разное",
+    "translation": "杂项",
+    "context": "7\nMiscellaneous"
+  },
+  {
+    "key": "generator.middleEarth",
+    "original": "Middle-earth",
+    "translation": "中洲",
+    "context": "Additional in reference"
+  },
+  {
+    "key": "generator.middleEarth.info",
+    "original": "Spawn directly into Middle-earth",
+    "translation": "直接生成在中洲",
+    "context": "Additional in reference"
+  },
+  {
+    "key": "generator.meClassic",
+    "original": "MISSING",
+    "translation": "中洲经典",
+    "context": "Additional in translation"
+  },
+  {
+    "key": "generator.meClassic.info",
+    "original": "MISSING",
+    "translation": "直接生成在生物群系随机生成的中洲",
+    "context": "Additional in translation"
+  }
+]

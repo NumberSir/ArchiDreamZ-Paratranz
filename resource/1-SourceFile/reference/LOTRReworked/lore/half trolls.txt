@@ -1,9 +1,0 @@
-# Another example by the mod team.
-#
-#title:Poetry
-#types:
-#reward
-#
-Roses are red,
-Violets are blue,
-Half-trolls are the best faction in the mod.

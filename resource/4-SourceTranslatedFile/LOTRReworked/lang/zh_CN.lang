@@ -1,0 +1,12 @@
+
+lotr.menu.title=魔戒 Mod[锟斤拷与彼梦汉化]: 为 Minecraft 带来新的中洲！
+
+lotr.config.dimension=群系ID
+lotr.config.gameplay=游戏玩法
+lotr.config.gui=显示与界面
+lotr.config.environment=环境与世界
+lotr.config.misc=杂项
+generator.middleEarth=中洲
+generator.middleEarth.info=直接生成在中洲
+generator.meClassic=中洲经典
+generator.meClassic.info=直接生成在生物群系随机生成的中洲

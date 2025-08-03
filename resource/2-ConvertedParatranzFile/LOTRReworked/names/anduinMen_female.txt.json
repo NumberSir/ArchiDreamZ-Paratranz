@@ -1,0 +1,44 @@
+[
+  {
+    "key": "LOTRReworked.names.anduinMen_female.0",
+    "original": "Адосинда",
+    "translation": "阿多辛达",
+    "context": "Adosinda"
+  },
+  {
+    "key": "LOTRReworked.names.anduinMen_female.1",
+    "original": "Амальфрида",
+    "translation": "阿马尔弗里达",
+    "context": "Amalfrida"
+  },
+  {
+    "key": "LOTRReworked.names.anduinMen_female.2",
+    "original": "Амалина",
+    "translation": "",
+    "context": "Amalina"
+  },
+  {
+    "key": "LOTRReworked.names.anduinMen_female.3",
+    "original": "Авагиса",
+    "translation": "",
+    "context": "Avagisa"
+  },
+  {
+    "key": "LOTRReworked.names.anduinMen_female.4",
+    "original": "Авина",
+    "translation": "阿维娜",
+    "context": "Avina"
+  },
+  {
+    "key": "LOTRReworked.names.anduinMen_female.6",
+    "original": "Extra keys in translation",
+    "translation": "我是译者自创的第一个NPC姓名",
+    "context": ""
+  },
+  {
+    "key": "LOTRReworked.names.anduinMen_female.7",
+    "original": "Extra keys in translation",
+    "translation": "我是译者自创的第二个NPC姓名",
+    "context": ""
+  }
+]

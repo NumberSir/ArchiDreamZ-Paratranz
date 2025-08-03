@@ -1,0 +1,14 @@
+[
+  {
+    "key": "CustomNPCs.quests.The Way of the Hobbit.file27.Text",
+    "original": "I met Bilbo in Rivendell and he told me about his adventures.\n\nI should take a look around here...\nperhaps there are more clues to Bilbo's story here.",
+    "translation": "我在幽谷遇到了比尔博，他给我讲了他的冒险经历。\n\n我应该在这里四处看看...\n也许这里有更多关于比尔博故事的线索。",
+    "context": ""
+  },
+  {
+    "key": "CustomNPCs.quests.The Way of the Hobbit.file27.CompleteText",
+    "original": "<<Council of the Wizards>>\n\nI should speak to Gandalf, he looks concerned.\n\n",
+    "translation": "<<巫师理事会>>\n\n我应该和甘道夫谈谈，他看起来很担心。\n\n",
+    "context": ""
+  }
+]
