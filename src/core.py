@@ -767,10 +767,11 @@ class Restoration:
 			original: str = kwargs["original"]
 			download: list[dict] = kwargs["download"]
 
+			key_prefix = f"{'.'.join(filepath.with_suffix('').with_suffix('').parts[:-1])}.file{filepath.with_suffix('').with_suffix('').name}"
 			for pattern, key in {
-				re.compile(r'\"Title\": \"([\s\S]*?)\",*\n'): "title",
-				re.compile(r'\"Text\": \"([\s\S]*?)\",*\n'): "text",
-				re.compile(r'\"CompleteText\": \"([\s\S]*?)\",*\n'): "completetext",
+				re.compile(r'\"Title\": \"([\s\S]*?)\",*\n'): f"{key_prefix}.Title",
+				re.compile(r'\"Text\": \"([\s\S]*?)\",*\n'): f"{key_prefix}.Text",
+				re.compile(r'\"CompleteText\": \"([\s\S]*?)\",*\n'): f"{key_prefix}.CompleteText",
 			}.items():
 				original = self._regex_restore(pattern, download, key, original)
 			return original
