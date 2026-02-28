@@ -750,7 +750,9 @@ class Restoration:
                     f"{original[title.end():]}"
                 )
 
-            for pattern, key in {re.compile(r'\"DialogText\": \"([\s\S]*?)\",*\n'): "dialogtext"}.items():
+            for pattern, key in {
+	            re.compile(r'\"DialogText\": \"([\s\S]*?)\",*\n'): f"{'.'.join(filepath.with_suffix('').parts[:-1])}.file{filepath.with_suffix('').name}.DialogText"
+            }.items():
                 original = self._regex_restore(pattern, download, key, original)
             return original
 
