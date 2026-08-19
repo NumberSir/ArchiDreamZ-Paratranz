@@ -696,13 +696,16 @@ class Restoration:
 			result = []
 			for line in download:
 				if line["key"].startswith("BLANK"):
-					result.append("\n")
+					result.append("")
 					continue
 
 				result.append(
-					(line['translation'] or line['original']).rstrip('\n') + "\n"
+					(line['translation'] or line['original']).rstrip('\r\n')
 				)
-			return result
+
+			# 修复还原后所有文件末尾都多一个换行的问题：文件末尾统一不带末尾换行，不依据源文件末尾是否有换行，因为源文件末尾换行状态本身就不统一。
+			# 文件末尾的空白行（BLANK 条目）属于内容，照常保留。
+			return "\n".join(result)
 
 		return self._restore_general(
 			filepath=filepath,
